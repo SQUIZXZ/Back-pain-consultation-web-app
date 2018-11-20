@@ -17,7 +17,14 @@ p{
   text-align: center;
 }
 
-button{
-  margin: auto;
+a{
+  text-align: center;
   display: block;
+  font-size: 20;
+}
+
+u{
+  text-align: center;
+  display: block;
+  font-size: 20;
 }
