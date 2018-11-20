@@ -1,0 +1,23 @@
+*{
+  padding: 0px;
+  margin:0px
+}
+
+h1{
+  font:verdana;
+  text-align: center;
+}
+
+body{
+  background-color: lightblue;
+}
+
+p{
+  font-size: 25;
+  text-align: center;
+}
+
+button{
+  margin: auto;
+  display: block;
+}
