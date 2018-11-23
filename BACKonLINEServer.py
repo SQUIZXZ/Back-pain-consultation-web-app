@@ -24,31 +24,26 @@ def getquestion():
 
 
 # Hard codeed - testing if server is successfully processes data into the DB
-''' @app.route("/getquestion")
-def testing_data():
-	cur.execute("INSERT INTO Clinitions VALUES(4, 5, 'Ryan' )")
-	conn.commit()
+# @app.route("/getquestion")
+#def testing_data():
+#	cur.execute("INSERT INTO Clinitions(ID, clinitionID, clinitionName) VALUES(4, 5, 'Ryan' )")
+#	conn.commit()
 
-testing_data()'''
-
-
+#testing_data()
 
 
-	# try:
-		# conn = sqlite.connect(DATABASE)
-		# cur = conn.cursor()
-		# cur.execute("SELECT quetsion FROM Questions WHERE questionID = 1")
-		# data = cur.fetchall()
-		# print(data)
-	# except:
-	#     print("An Error has occured", data)
-	#     conn.close()
-	# finally:
-	#     conn.close()
-	#     return str(data)
-
-
-
+# try:
+    # conn = sqlite.connect(DATABASE)
+    # cur = conn.cursor()
+    # cur.execute("SELECT quetsion FROM Questions WHERE questionID = 1")
+    # data = cur.fetchall()
+    # print(data)
+# except:
+#     print("An Error has occured", data)
+#     conn.close()
+# finally:
+#     conn.close()
+#     return str(data)
 
 
 @app.route("/submitoption")
