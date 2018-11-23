@@ -22,18 +22,21 @@ def getquestion():
 	options = cur.fetchall()
 	print(question,options)
 
+	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options))
+	resp.set_cookie('questionID', '1')
 
-	return render_template('Template1.html', name = "Humzah", question = question[0], options = options)
+
+	return resp
 
 
 # Hard codeed - testing if server is successfully processes data into the DB
-''' @app.route("/getquestion")
-def testing_data():
-	cur.execute("INSERT INTO Clinitions VALUES(4, 5, 'Ryan' )")
-	conn.commit()
-
-testing_data()'''
-
+# @app.route("/getquestion")
+# def testing_data():
+# 	cur.execute("INSERT INTO Clinitions VALUES(4, 5, 'Ryan' )")
+# 	conn.commit()
+#
+# testing_data()
+#
 
 
 
@@ -56,7 +59,24 @@ testing_data()'''
 
 @app.route("/submitoption")
 def submitoption():
-	return "Submission has been sent"  # Needs printing?
+	nextquestion = int(request.cookies.get('questionID'))
+	print(nextquestion)
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	questionID = nextquestion + 1
+	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
+	question = cur.fetchone()
+	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
+	options = cur.fetchall()
+	print(question,options)
+
+	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options))
+	resp.set_cookie('questionID', '1')
+
+
+	return resp
+
+	# return "Submission has been sent"  # Needs printing?
 
 if __name__ == "__main__":
 	app.run(debug=True)
