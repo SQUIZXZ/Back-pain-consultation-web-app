@@ -15,12 +15,15 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 def getquestion():
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
-	cur.execute("SELECT quetsion FROM Questions WHERE questionID = 1")
-	data = cur.fetchall()
-	print(data)
+	questionID = 1
+	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
+	question = cur.fetchone()
+	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
+	options = cur.fetchall()
+	print(question,options)
 
 
-	return render_template('Template1.html', name = "Humzah", data = data)
+	return render_template('Template1.html', name = "Humzah", question = question[0], options = options)
 
 
 # Hard codeed - testing if server is successfully processes data into the DB
