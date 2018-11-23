@@ -16,13 +16,15 @@ def getquestion():
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
 	questionID = 1
+	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (questionID,))
+	questionNum = cur.fetchone()
 	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
 	question = cur.fetchone()
 	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
 	options = cur.fetchall()
-	print(question,options)
+	print(question,options,questionNum)
 
-	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options))
+	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options, questionNum = questionNum))
 	resp.set_cookie('questionID', '1')
 
 
@@ -64,13 +66,15 @@ def submitoption():
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
 	questionID = nextquestion + 1
+	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (questionID,))
+	questionNum = cur.fetchone()
 	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
 	question = cur.fetchone()
 	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
 	options = cur.fetchall()
-	print(question,options)
+	print(questionNum,question,options)
 
-	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options))
+	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options, questionNum = questionNum))
 	resp.set_cookie('questionID', '1')
 
 

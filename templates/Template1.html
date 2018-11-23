@@ -2,8 +2,8 @@
   {%extends 'test.html'%}
   {%block testBlock%}
   <p> This is Template {{ name }} </p>
-  <p> Q1{{ question }} </p>
+  <p> {{ questionNum }} {{ question }} </p>
   <p>Options {{options}}</p>
-  <a href = "/submitoption"> Next </a> 
+  <a href = "/submitoption"> Next </a>
 
   {%endblock%}
