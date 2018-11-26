@@ -3,8 +3,8 @@ from flask import Flask, redirect, request, render_template, make_response, esca
 import sqlite3
 
 DATABASE = "BACKonLINE.db"
-conn = sqlite3.connect(DATABASE)
-cur = conn.cursor()
+# conn = sqlite3.connect(DATABASE)
+# cur = conn.cursor()
 questionID = 1
 app = Flask(__name__)
 
@@ -12,7 +12,36 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
 @app.route("/getquestion", methods =["GET", "POST"])
+# def writedata():
+# 	print("Writing data into database")
+# 	print('tititititi')
+# 	# if request.method == "POST":
+# 	# 	option = request.form.get('option', default="Error")
+# 	# 	print("Inserting"+option)
+# 	try:
+# 		print('into the try')
+# 		conn = sqlite3.connect(DATABASE)
+# 		print('into the try111')
+# 		cur = conn.cursor()
+# 		print('into the try222')
+# 		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue') VALUES (?,?,?,?)",(1,1,2,0))
+# 		print('into the try333')
+# 		conn.commit()
+# 		print('into the try444')
+# 		msg = "record saved successfully"
+# 	except:
+# 		conn.rollback()
+# 		print('rollback')
+# 		msg = "An error has occured"
+# 	finally:
+# 		conn.close()
+# 		print('finllay')
+# 		return msg
+
+
 def getquestion():
+	print("************************************ getQuestion function being called")
+	# writedata()
 	global questionID
 	options_list, question, questionNum, template = return_question()
 
@@ -33,6 +62,7 @@ def getquestion():
 			questionID = questionID + 1
 			options_list, question, questionNum, template = return_question()
 			print("increment")
+			writedata()
 			#resp.set_cookie('questionID', str(questionID))
 			#return resp
 		elif request.form["submit_button"] == "Back":
@@ -44,6 +74,9 @@ def getquestion():
 			#return resp
 	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum))
 	return resp
+
+
+
 def return_question():
 	global questionID
 	#questionID = int(request.cookies.get('questionID'))
@@ -91,6 +124,33 @@ def return_from_db(item):
 	# print(cur.fetchone())
 	return cur.fetchone()
 
+def writedata():
+	print("Writing data into database")
+	print('tititititi')
+	# if request.method == "POST":
+	# 	option = request.form.get('option', default="Error")
+	# 	print("Inserting"+option)
+	try:
+		print('into the try')
+		conn = sqlite3.connect(DATABASE)
+		print('into the try111')
+		cur = conn.cursor()
+		print('into the try222')
+		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue') VALUES (?,?,?,?)",(1,1,2,0))
+		print('into the try333')
+		conn.commit()
+		print('into the try444')
+		msg = "record saved successfully"
+	except:
+		conn.rollback()
+		print('rollback')
+		msg = "An error has occured"
+	finally:
+		conn.close()
+		print('finllay')
+		return msg
+
+
 # Hard codeed - testing if server is successfully processes data into the DB
 # @app.route("/getquestion")
 # def testing_data():
@@ -121,6 +181,8 @@ def return_from_db(item):
 
 @app.route("/submitoption")
 def submitoption():
+	print("************************************ submit function being called")
+	writedata()
 	nextquestion = int(request.cookies.get('questionID'))
 	print(nextquestion)
 	conn = sqlite3.connect(DATABASE)
@@ -141,6 +203,17 @@ def submitoption():
 	return resp
 
 	# return "Submission has been sent"  # Needs printing?
+
+# def writedata():
+# 	print("Writing data into database")
+# 	if request.method == "POST"
+# 		option = request.form['option']
+# 		value = request.form['value']
+# 	print(option, value)
+
+
+
+
 
 if __name__ == "__main__":
 	app.run(debug=True)
