@@ -5,6 +5,21 @@
   <p> {{ questionNum }} {{ question }} </p>
   <p>Options {{options}}</p>
   <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input>
-  <a href = "/submitoption"> Next </a>
 
+  <form action="" method = "POST" name="question-options">
+    <table class="table">
+      {%for value in options%}
+      <tr>
+        <td>
+          <label class="checkbox">
+            <input type="radio" name="option" value="{{value}}">
+          </label>
+          {{value}}
+        </td>
+      </tr>
+      {%endfor%}
+    </table>
+    <input type="submit" value="Next">
+  </form>
+  <a href = "/"> Next </a>
   {%endblock%}

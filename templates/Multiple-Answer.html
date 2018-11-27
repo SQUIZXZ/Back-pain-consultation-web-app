@@ -2,7 +2,8 @@
   {%extends 'test.html'%}
   {%block testBlock%}
   <!-- <p> This is Template {{ name }} </p> -->
-  <p> {{ questionNum[0] }} {{ question }} </p>
+  <p> Question: {{ questionNum[0] }} </p>
+  <p>  {{ question }}</p>
   <!-- <p>Options {{options}}</p> -->
   <!-- <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
 
@@ -12,15 +13,15 @@
       <tr>
         <td>
           <label class="checkbox">
-            <input type="checkbox" name="option" value="{{value}}" required = True>
+            <input type="checkbox" name="option" value="{{value}}">
           </label>
           {{value}}
         </td>
       </tr>
       {%endfor%}
     </table>
-    <input type="submit" name="submit_button" value="Back">
-    <input type="submit" name="submit_button" value="Next">
+    <input type="submit" name="submit_button" value="< Back" formnovalidate>
+    <input type="submit" name="submit_button" value="Next >">
   </form>
-  <a href = "/"> Next </a>
+  <!-- <a href = "/"> Next </a> -->
   {%endblock%}
