@@ -54,7 +54,7 @@ def getquestion():
 	return resp
 def writethings(question_result,question_number):
 	print("Values passed", question_result, question_number)
-	print("Wokring")
+	print("Working")
 	values = []
 	for result in question_result:
 

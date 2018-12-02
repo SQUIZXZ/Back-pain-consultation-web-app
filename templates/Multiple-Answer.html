@@ -27,12 +27,17 @@
     var options_stuff = document.forms["question-options"].elements["option"];
     var list_length = options_stuff.length;
     var last_item = options_stuff[list_length-1]
-    // alert(options_stuff[list_length-1].value);
-    // alert(options_stuff[list_length-1].checked);
 
-    // if options_stuff[list_length-1].checked == True{
-    //   alert("TICKED");
-    // }
+    last_item.addEventListener('click',function(){
+      if (last_item.checked == true){
+        // alert("CHEKD");
+        for (var i = 0; i< list_length-1; i++){
+          options_stuff[i].checked = false;
+        }
+
+      }
+    })
+
     for (var i = 0; i<list_length-1; i++){
       options_stuff[i].onclick = uncheck_last
 
