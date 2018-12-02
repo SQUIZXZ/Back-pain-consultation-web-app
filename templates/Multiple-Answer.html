@@ -23,5 +23,26 @@
     <input type="submit" name="submit_button" value="< Back" formnovalidate>
     <input type="submit" name="submit_button" value="Next >">
   </form>
+  <script>
+    var options_stuff = document.forms["question-options"].elements["option"];
+    var list_length = options_stuff.length;
+    var last_item = options_stuff[list_length-1]
+    // alert(options_stuff[list_length-1].value);
+    // alert(options_stuff[list_length-1].checked);
+
+    // if options_stuff[list_length-1].checked == True{
+    //   alert("TICKED");
+    // }
+    for (var i = 0; i<list_length-1; i++){
+      options_stuff[i].onclick = uncheck_last
+
+    }
+    function uncheck_last(){
+      // alert("top stuff checkd")
+
+      last_item.checked = false;
+    }
+
+  </script>
   <!-- <a href = "/"> Next </a> -->
   {%endblock%}
