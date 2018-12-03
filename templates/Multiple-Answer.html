@@ -2,7 +2,7 @@
   {%extends 'test.html'%}
   {%block testBlock%}
   <!-- <p> This is Template {{ name }} </p> -->
-  <p> Question: {{ questionNum[0] }} </p>
+  <p> Question {{ questionNum[0] }}: </p>
   <p>  {{ question }}</p>
   <!-- <p>Options {{options}}</p> -->
   <!-- <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
@@ -21,8 +21,8 @@
       </tr>
       {%endfor%}
     </table>
-    <input type="submit" name="submit_button" value="< Back" formnovalidate>
-    <input type="submit" name="submit_button" value="Next >" onclick="valquestion()">
+    <input type="submit" name="Back" value="< Back" formnovalidate>
+    <input type="submit" name="Next" value="Next >" onclick="valquestion()">
   </form>
   <script>
     var options_stuff = document.forms["question-options"].elements["option"];
