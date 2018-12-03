@@ -30,6 +30,7 @@ def getquestion():
 			#print("es",hey1)
 			question_result = request.form.getlist("option")
 
+
 			for result in question_result:
 				if result == "":
 					pass
@@ -54,7 +55,7 @@ def getquestion():
 	return resp
 def writethings(question_result,question_number):
 	print("Values passed", question_result, question_number)
-	print("Wokring")
+	print("Working")
 	values = []
 	for result in question_result:
 
@@ -94,6 +95,8 @@ def writethings(question_result,question_number):
 
 		print('finllay')
 		return msg
+
+
 	# print("Writing data into database")
 	# #print('tititititi')
 	# # if request.method == "POST":

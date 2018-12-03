@@ -13,15 +13,69 @@
       <tr>
         <td>
           <label class="checkbox">
-            <input type="checkbox" name="option" value="{{value}}">
+            <input class="box" type="checkbox" name="option" value="{{value}}">
+            {{value}}
           </label>
-          {{value}}
+
         </td>
       </tr>
       {%endfor%}
     </table>
     <input type="submit" name="submit_button" value="< Back" formnovalidate>
-    <input type="submit" name="submit_button" value="Next >">
+    <input type="submit" name="submit_button" value="Next >" onclick="valquestion()">
   </form>
+  <script>
+    var options_stuff = document.forms["question-options"].elements["option"];
+    var list_length = options_stuff.length;
+    var last_item = options_stuff[list_length-1];
+    // alert(last_item.value)
+
+    function valquestion(){
+    for (var i = 0; i<list_length; i++){
+      if (options_stuff[i].checked == false) {
+      }
+    } alert("NONE");
+  }
+
+    var condition_array = ["I don't take any medication for my back pain",
+    "I am unable to ease my back pain",
+    "Everything I do causes me pain",
+    "Nothing I do stops my pain",
+    "Nothing helped"];
+    // alert(condition_array.includes(String(last_item.value)))
+    // alert(typeof last_item.value)
+    // alert(typeof condition_array[0])
+
+   //function val() {
+    // if(options_stuff.checked == false) {
+      // alert('You must select an option')
+    // }
+  // }
+
+    last_item.addEventListener('click',function(){
+      if (last_item.checked == true && condition_array.includes(String(last_item.value))){
+        // alert(condition_array.includes(String(last_item.value)))
+        // alert("CHECKED");
+        for (var i = 0; i< list_length-1; i++){
+          options_stuff[i].checked = false;
+        }
+
+      }
+    })
+
+    for (var i = 0; i<list_length-1; i++){
+      if (condition_array.includes(String(last_item.value))){
+        options_stuff[i].onclick = uncheck_last
+
+      }
+
+
+    }
+    function uncheck_last(){
+      // alert("top stuff checkd")
+      last_item.checked = false;
+    }
+
+  </script>
   <!-- <a href = "/"> Next </a> -->
   {%endblock%}
