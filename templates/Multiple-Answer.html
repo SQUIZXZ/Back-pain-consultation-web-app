@@ -21,16 +21,23 @@
       {%endfor%}
     </table>
     <input type="submit" name="submit_button" value="< Back" formnovalidate>
-    <input type="submit" name="submit_button" value="Next >">
+    <input type="submit" name="submit_button" value="Next >" onclick="val()">
   </form>
   <script>
     var options_stuff = document.forms["question-options"].elements["option"];
     var list_length = options_stuff.length;
     var last_item = options_stuff[list_length-1]
 
+   //function val() {
+    // if(options_stuff.checked == false) {
+      // alert('You must select an option')
+    // }
+  // }
+
+
     last_item.addEventListener('click',function(){
       if (last_item.checked == true){
-        // alert("CHEKD");
+        // alert("CHECKED");
         for (var i = 0; i< list_length-1; i++){
           options_stuff[i].checked = false;
         }
