@@ -28,7 +28,7 @@
     params = 'patientName='+patientName+'&Password'+Password+'&Email'+Email;
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/Patient/AddPatient', true);
-    xhttp.setRequestHeader()
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.onload = function() {
       if (xhttp.readystate === 4 && xhttp.status ===200) {
         console.log(xhttp.responseText);
