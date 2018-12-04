@@ -253,17 +253,25 @@ def patientAddDetails():
 	if request.method == 'GET':
 		return render_template('Signup.html')
 	if request.method == 'POST':
+		print(request.form)
 		patientName = request.form.get('patientName', default="Error")
 		Password = request.form.get('Password', default="Error")
 		Email = request.form.get('Email', default="Error")
+		print(patientName)
+		print(Password)
+		print(Email)
 		print("Inserting patient"+patientName)
 		try:
 			conn = sqlite3.connect(DATABASE)
+			print("patient1")
 			cur = conn.cursor()
+			print("patient2")
 			cur.execute("INSERT INTO Patients ('patientName', 'Password', 'Email') VALUES (?,?,?)", (patientName, Password, Email) )
-			con.commit()
+			print("patient3")
+			conn.commit()
 			msg = "Record added successfully"
-		except:
+		except Exception as e:
+			print(e)
 			conn.rollback()
 			msg = "Error adding patient"
 		finally:
