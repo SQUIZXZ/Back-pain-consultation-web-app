@@ -247,6 +247,29 @@ def return_from_db(item, question_number):
 	#     conn.close()
 	#     return str(data)
 
+@app.route("/Patient/AddPatient", methods = ['POST', 'GET'])
+def patientAddDetails():
+	if request.method == 'GET':
+		return render_template('Signup.html')
+	if request.method == 'POST':
+		patientName = request.form.get('patientName', default="Error")
+		Password = request.form.get('Password', default="Error")
+		Email = request.form.get('Email', default="Error")
+		print("Inserting patient"+patientName)
+		try:
+			conn = sqlite3.connect(DATABASE)
+			cur = conn.cursor()
+			cur.execute("INSERT INTO Patients ('patientName', 'Password', 'Email') VALUES (?,?,?)", (patientName, Password, Email) )
+			con.commit()
+			msg = "Record added successfully"
+		except:
+			conn.rollback()
+			msg = "Error adding patient"
+		finally:
+			conn.close()
+			return msg
+
+
 
 
 
