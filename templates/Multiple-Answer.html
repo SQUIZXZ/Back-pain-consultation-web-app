@@ -21,8 +21,8 @@
       </tr>
       {%endfor%}
     </table>
-    <input type="submit" name="Back" value="< Back" formnovalidate>
-    <input type="submit" value="Next > " name="Next">
+    <input type="submit" name="Back" value="< Back" onclick="clicked='Back'" formnovalidate>
+    <input type="submit" value="Next > " name="Next" onclick="clicked='Next'">
   </form>
   <script>
     var options_stuff = document.forms["question-options"].elements["option"];
@@ -30,8 +30,12 @@
     var last_item = options_stuff[list_length-1];
     // alert(last_item.value)
 
+    // this will store what the button was pressed.
+    var clicked;
     function valquestion(){
+      alert(clicked);
       var default1 = false;
+      if (clicked == "Next") {
       for (var i = 0; i<list_length; i++){
         if (options_stuff[i].checked == true) {
           default1 = true;
@@ -45,7 +49,11 @@
       alert("accepted")
     }
       return default1;
+    }else{
+      default1 = true;
+      return default1
     }
+  }
 
     var condition_array = ["I don't take any medication for my back pain",
     "I am unable to ease my back pain",
