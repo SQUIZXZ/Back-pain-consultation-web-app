@@ -19,6 +19,7 @@ def login():
 		print("acualy working")
 		username = request.form["username"]
 		password = request.form["password"]
+
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
@@ -268,10 +269,6 @@ def patientAddDetails():
 		finally:
 			conn.close()
 			return msg
-
-
-
-
 
 
 @app.route("/submitoption")
