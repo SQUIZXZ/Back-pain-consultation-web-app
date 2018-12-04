@@ -1,0 +1,32 @@
+
+  {%extends 'test.html'%}
+  {%block testBlock%}
+  <!-- <p> This is Template {{ name }} </p> -->
+  <p> Question: {{ questionNum[0] }} </p>
+  <p>  {{ question }}</p>
+  <!-- <p>Options {{options}}</p> -->
+  <!-- <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
+
+  <form action="" method = "POST" name="question-options">
+    <table class="table">
+
+      <tr>
+        <td>
+          <label class="slider">
+            <input type="range" name="option" min = "{{options[0]}}" max = "{{options[-1]}}" value="5" required = True>
+          </label>
+          {{value}}
+          <ul class ="range-labels">
+            {%for value in options%}
+            <li>{{value}}</li>
+            {%endfor%}
+          </ul>
+        </td>
+      </tr>
+
+    </table>
+    <input type="submit" name="submit_button" value="< Back" formnovalidate>
+    <input type="submit" name="submit_button" value="Next >">
+  </form>
+  <!-- <a href = "/"> Next </a> -->
+  {%endblock%}
