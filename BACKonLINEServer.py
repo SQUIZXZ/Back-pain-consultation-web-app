@@ -13,12 +13,12 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
-@app.route("/login", methods = ["GET","POST"])
-def login():
-	if request.method == "POST":
-		print("acualy working")
-		username = request.form["username"]
-		password = request.form["password"]
+# @app.route("/login", methods = ["GET","POST"])
+# def login():
+# 	if request.method == "POST":
+# 		print("acualy working")
+# 		username = request.form["username"]
+# 		password = request.form["password"]
 
 @app.route("/getquestion", methods =["GET", "POST"])
 
@@ -278,21 +278,24 @@ def patientAddDetails():
 			conn.close()
 			return msg
 
-@app.route("Login", methods = ['GET', 'POST'])
+@app.route("/Login", methods = ['GET', 'POST'])
 def login():
 	if request.method=='POST':
 		uName = request.form.get('patientName', dafault = "Error")
-		pw = request.form.get('password', default = "Error"
+		pw = request.form.get('password', default = "Error")
 		if checkCredentials(uName, pw):
-			resp = make_response(render_template('Login.html', msg= 'Incorrect Login'))
+			resp = make_response(render_template('Homepage.html', msg= 'Incorrect Login'))
 			resp.set_cookie('patientName', uName)
 		else:
-			resp = make_response(render_template('Login.html', msg= 'Incorrect Login'))
+			resp = make_response(render_template('Homepage.html', msg= 'Incorrect Login'))
 		if uName == "Clinitions":
 			resp.set_cookie('usertype', 'Admin')
 		else:
 			resp.set_cookie('usertype', 'Patient')
 		return resp
+	else:
+		patientName = request.cookies.get('patientName')
+		return render_template('Login.html', msg='', patientName=patientName)
 
 def checkCredentials(uName, pw):
 	return pw == 'BACKonLINE'

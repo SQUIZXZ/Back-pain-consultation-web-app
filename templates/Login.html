@@ -11,10 +11,15 @@
 <div class="login-page">
   <div class="form">
     <form class="register-form">
-    <form class="login-form">
+      <form id='myForm' action="/Login" method="post">
+    User name:<input type = "text" name = "patientName"><br>
+    Password:<input type = "password" name = "password"><br>
+    <button type = "submit"> submit </button>
+  </form>
+    <!-- <form class="login-form">
       <input type="text" placeholder="username" name="patientName" required/>
       <input type="password" placeholder="password" name="password"/>
-      <button>login</button>
+      <button>login</button> -->
       <p class="message">Not registered? <a href="Signup.html">Create an account</a></p>
     </form>
   </div>
