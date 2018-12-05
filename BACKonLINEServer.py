@@ -11,7 +11,6 @@ app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-<<<<<<< HEAD
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
@@ -22,8 +21,6 @@ def show_home():
 # 		username = request.form["username"]
 # 		password = request.form["password"]
 
-=======
->>>>>>> 47e973543d97245dd0fe057696a547f237fc7295
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
@@ -284,27 +281,19 @@ def patientAddDetails():
 
 @app.route("/Login", methods = ['GET', 'POST'])
 def login():
-	if request.method=='POST':
-		uName = request.form.get('patientName', dafault = "Error")
-		pw = request.form.get('password', default = "Error")
-		if checkCredentials(uName, pw):
-			resp = make_response(render_template('Homepage.html', msg= 'Incorrect Login'))
-			resp.set_cookie('patientName', uName)
-		else:
-			resp = make_response(render_template('Homepage.html', msg= 'Incorrect Login'))
-		if uName == "Clinitions":
-			resp.set_cookie('usertype', 'Admin')
-		else:
-			resp.set_cookie('usertype', 'Patient')
-		return resp
-	else:
-		patientName = request.cookies.get('patientName')
-		return render_template('Login.html', msg='', patientName=patientName)
+	if request.method == 'POST':
+		username = request.form.get('username', default="Error")
+		password = request.form.get('password', default="Error")
+		print(username, password)
+		try:
+			conn = sqlite3.connect(DATABASE)
+			cur = conn.cursor()
+		except:
+			pass
+	return render_template("Login.html")
 
-def checkCredentials(uName, pw):
-	return pw == 'BACKonLINE'
 
-app.secret_key = ' abc123def456ghi789'
+
 
 
 
