@@ -19,6 +19,7 @@ def login():
 		print("acualy working")
 		username = request.form["username"]
 		password = request.form["password"]
+
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
@@ -292,10 +293,6 @@ def login():
 		else:
 			resp.set_cookie('usertype', 'Patient')
 		return resp
-
-
-
-
 
 
 @app.route("/submitoption")
