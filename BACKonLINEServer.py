@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for
+from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for, g
 import sqlite3
 
 DATABASE = "BACKonLINE.db"
@@ -7,18 +7,9 @@ conn = sqlite3.connect(DATABASE)
 cur = conn.cursor()
 questionID = 1
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-
-@app.route("/", methods = ["GET","POST"])
-def show_home():
-	return redirect(url_for('static', filename='Login.html'))
-@app.route("/login", methods = ["GET","POST"])
-def login():
-	if request.method == "POST":
-		print("acualy working")
-		username = request.form["username"]
-		password = request.form["password"]
 
 @app.route("/getquestion", methods =["GET", "POST"])
 
@@ -277,6 +268,7 @@ def patientAddDetails():
 		finally:
 			conn.close()
 			return msg
+
 
 
 @app.route("/submitoption")
