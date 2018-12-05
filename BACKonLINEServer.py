@@ -11,6 +11,7 @@ app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
+# <<<<<<< HEAD
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
@@ -21,6 +22,8 @@ def show_home():
 # 		username = request.form["username"]
 # 		password = request.form["password"]
 
+# =======
+# >>>>>>> 47e973543d97245dd0fe057696a547f237fc7295
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
@@ -278,25 +281,55 @@ def patientAddDetails():
 		finally:
 			conn.close()
 			return msg
+		return "This is kind of working i think"
 
 @app.route("/Login", methods = ['GET', 'POST'])
 def login():
-	if request.method == 'POST':
-		username = request.form.get('username', default="Error")
-		password = request.form.get('password', default="Error")
-		print(username, password)
+	if request.method=='POST':
+		username = request.form.get('username', default = "Error")
+		password = request.form.get('password', default = "Error")
+		print(username,password)
 		try:
 			conn = sqlite3.connect(DATABASE)
 			cur = conn.cursor()
+			print("BEFORE")
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName = ? AND Password=?))",(username,password,))
+			print("AFTER")
+			patient_exists = cur.fetchone()
+			print("BEFORE")
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
+			print("AFTER")
+			clinition_exists = cur.fetchone()
+			print("FFETCHED")
+			cur.close()
+			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
 		except:
-			pass
-	return render_template("Login.html")
+			print("SOMETHING WENT WRONG")
+		if patient_exists[0] == 1:
+			return redirect("Home/Patient")
+		elif clinition_exists[0] == 1:
+			return redirect("Home/Clinition")
+		else:
+			return "THIS DOESN@T MATCH ANYTHING IN THE DATABASE"
 
 
 
 
+	return render_template('Login.html', msg='')
 
+def checkCredentials(uName, pw):
+	return pw == 'BACKonLINE'
 
+app.secret_key = ' abc123def456ghi789'
+##### patient route
+@app.route("/Home/Patient", methods = ["GET"])
+def p_home():
+	return render_template("Patient.html")
+
+#### cliniton route
+@app.route("/Home/Clinition", methods = ["GET","POST"])
+def c_home():
+	return render_template("Clinition.html")
 
 @app.route("/submitoption")
 def submitoption():
