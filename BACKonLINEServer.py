@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for
+from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for, g
 import sqlite3
 
 DATABASE = "BACKonLINE.db"
@@ -7,9 +7,11 @@ conn = sqlite3.connect(DATABASE)
 cur = conn.cursor()
 questionID = 1
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
+<<<<<<< HEAD
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
@@ -20,6 +22,8 @@ def show_home():
 # 		username = request.form["username"]
 # 		password = request.form["password"]
 
+=======
+>>>>>>> 47e973543d97245dd0fe057696a547f237fc7295
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
@@ -301,6 +305,7 @@ def checkCredentials(uName, pw):
 	return pw == 'BACKonLINE'
 
 app.secret_key = ' abc123def456ghi789'
+
 
 
 
