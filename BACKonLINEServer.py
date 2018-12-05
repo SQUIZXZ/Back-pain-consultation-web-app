@@ -280,19 +280,25 @@ def patientAddDetails():
 
 @app.route("Login", methods = ['GET', 'POST'])
 def login():
-	if method request.method=='POST':
+	if request.method=='POST':
 		uName = request.form.get('patientName', dafault = "Error")
 		pw = request.form.get('password', default = "Error"
 		if checkCredentials(uName, pw):
-			resp = make_response(render_template('', msg= 'Incorrect Login'))
+			resp = make_response(render_template('Login.html', msg= 'Incorrect Login'))
 			resp.set_cookie('patientName', uName)
 		else:
-			resp = make_response(render_template('', msg= 'Incorrect Login'))
+			resp = make_response(render_template('Login.html', msg= 'Incorrect Login'))
 		if uName == "Clinitions":
 			resp.set_cookie('usertype', 'Admin')
 		else:
 			resp.set_cookie('usertype', 'Patient')
 		return resp
+
+def checkCredentials(uName, pw):
+	return pw == 'BACKonLINE'
+
+app.secret_key = ' abc123def456ghi789'
+
 
 
 @app.route("/submitoption")
