@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for, g
+from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for, flash
 import sqlite3
 
 DATABASE = "BACKonLINE.db"
@@ -11,6 +11,10 @@ app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
+<<<<<<< HEAD
+=======
+# <<<<<<< HEAD
+>>>>>>> 1e94c57cb6ec6389431dc91fe3062f7deec97fcc
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
@@ -21,7 +25,12 @@ def show_home():
 # 		username = request.form["username"]
 # 		password = request.form["password"]
 
+<<<<<<< HEAD
 
+=======
+# =======
+# >>>>>>> 47e973543d97245dd0fe057696a547f237fc7295
+>>>>>>> 1e94c57cb6ec6389431dc91fe3062f7deec97fcc
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
@@ -279,33 +288,60 @@ def patientAddDetails():
 		finally:
 			conn.close()
 			return msg
+		return "This is kind of working i think"
 
 @app.route("/Login", methods = ['GET', 'POST'])
 def login():
 	if request.method=='POST':
-		uName = request.form.get('patientName', dafault = "Error")
-		pw = request.form.get('password', default = "Error")
-		if checkCredentials(uName, pw):
-			resp = make_response(render_template('Homepage.html', msg= 'Incorrect Login'))
-			resp.set_cookie('patientName', uName)
+		username = request.form.get('username', default = "Error")
+		password = request.form.get('password', default = "Error")
+		print(username,password)
+		try:
+			conn = sqlite3.connect(DATABASE)
+			cur = conn.cursor()
+			print("BEFORE")
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName = ? AND Password=?))",(username,password,))
+			print("AFTER")
+			patient_exists = cur.fetchone()
+			print("BEFORE")
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
+			print("AFTER")
+			clinition_exists = cur.fetchone()
+			print("FETCHED")
+			cur.close()
+			session['logged_in'] = True
+			session['username'] = request.form['username']
+			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
+		except:
+			print("SOMETHING WENT WRONG")
+		if patient_exists[0] == 1:
+			return redirect("Home/Patient")
+		elif clinition_exists[0] == 1:
+			return redirect("Home/Clinition")
 		else:
-			resp = make_response(render_template('Homepage.html', msg= 'Incorrect Login'))
-		if uName == "Clinitions":
-			resp.set_cookie('usertype', 'Admin')
-		else:
-			resp.set_cookie('usertype', 'Patient')
-		return resp
-	else:
-		patientName = request.cookies.get('patientName')
-		return render_template('Login.html', msg='', patientName=patientName)
+			return redirect("/Login")
+
+	return render_template('Login.html', msg='')
+
+@app.route('/logout')
+def logout():
+   session.pop('logged_in', None)
+   flash("You were logged out")
+   return redirect(url_for('login'))
 
 def checkCredentials(uName, pw):
 	return pw == 'BACKonLINE'
 
 app.secret_key = ' abc123def456ghi789'
+##### patient route
+@app.route("/Home/Patient", methods = ["GET"])
+def p_home():
+	return render_template("Patient.html")
 
-
-
+#### cliniton route
+@app.route("/Home/Clinition", methods = ["GET","POST"])
+def c_home():
+	return render_template("Clinition.html")
 
 @app.route("/submitoption")
 def submitoption():
