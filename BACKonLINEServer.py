@@ -11,7 +11,6 @@ app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-<<<<<<< HEAD
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
@@ -22,8 +21,7 @@ def show_home():
 # 		username = request.form["username"]
 # 		password = request.form["password"]
 
-=======
->>>>>>> 47e973543d97245dd0fe057696a547f237fc7295
+
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
