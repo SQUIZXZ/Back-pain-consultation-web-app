@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for, g
+from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for, flash
 import sqlite3
 
 DATABASE = "BACKonLINE.db"
@@ -300,8 +300,10 @@ def login():
 			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
 			print("AFTER")
 			clinition_exists = cur.fetchone()
-			print("FFETCHED")
+			print("FETCHED")
 			cur.close()
+			session['logged_in'] = True
+			session['username'] = request.form['username']
 			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
 		except:
 			print("SOMETHING WENT WRONG")
@@ -310,12 +312,15 @@ def login():
 		elif clinition_exists[0] == 1:
 			return redirect("Home/Clinition")
 		else:
-			return "THIS DOESN@T MATCH ANYTHING IN THE DATABASE"
-
-
-
+			return redirect("/Login")
 
 	return render_template('Login.html', msg='')
+
+@app.route('/logout')
+def logout():
+   session.pop('logged_in', None)
+   flash("You were logged out")
+   return redirect(url_for('login'))
 
 def checkCredentials(uName, pw):
 	return pw == 'BACKonLINE'
