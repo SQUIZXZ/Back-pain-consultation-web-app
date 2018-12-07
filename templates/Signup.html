@@ -13,8 +13,16 @@
       <input type="text" placeholder="name" name = "patientName" required/>
       <input type="password" placeholder="password" name = "Password" required/>
       <input type="email" placeholder="email address" name = "Email" required/>
-      <button>create</button>
-      <p class="message">Already registered? <a href="Login.html">Sign In</a></p>
+      <select name = "Gender" required>
+         <option value="Male">Male</option>
+         <option value="Female">Female</option>
+         <option value="Other">Other</option>
+         <option value="Prefer Not to Say">Prefer Not to Say</option>
+      </select>
+      <input type = "number" name = "Age" required/>
+
+      <button>Create</button>
+      <p class="message">Already registered? <a href="/Login">Sign In</a></p>
     </form>
     <span id="txt"></span>
   </div>
@@ -25,30 +33,46 @@
     var patientName = document.forms["signupform"]["patientName"].value;
     var Password = document.forms["signupform"]["Password"].value;
     var Email = document.forms["signupform"]["Email"].value;
-    params = 'patientName='+patientName+'&Password='+Password+'&Email='+Email;
+    var Gender = document.forms["signupform"]["Gender"].value;
+    var Age = document.forms["signupform"]["Age"].value;
+
+
+
+    params = 'patientName='+patientName+'&Password='+Password+'&Email='+Email+"&Gender="+Gender+"&Age="+Age;
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/Patient/AddPatient', true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    alert("THIS IS WORKING HERE")
+
     xhttp.onload = function() {
-      if (xhttp.readystate === 4 && xhttp.status === 200) {
+      alert(xhttp.readyState);
+      alert(xhttp.status);
+      if ((xhttp.readyState === 4) && (xhttp.status === 200)) {
+
+        alert("WE ARE INSIDE");
         console.log(xhttp.responseText);
-        document.getElementByID("txt").innerHTML = xhttp.repsonseText;
-      } else {
+        response_text = xhttp.responseText.trim();
+        alert(response_text);
+        if (response_text === "SUCCESS"){
+          // Change the route to wherever the user will be redirected to
+          window.location.href = "/Login";
+
+        }else if(response_text === "EXISTS"){
+          // Response text for if the user already exists in the database
+          alert("The patient already exists, please check email for their login details");
+        document.getElementByID("txt").innerHTML = xhttp.responseText;
+        }else {
+          // Response text for if the server gets an error while going into the DB
+        alert(response_text)
         console.error(xhttp.statusText);
+        }
       }
     };
     xhttp.send(params);
+
     return false;
   }
 
 </script>
-
-
-
-
-
-
-
-
 </body>
 </html>

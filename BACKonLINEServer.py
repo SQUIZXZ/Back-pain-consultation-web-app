@@ -11,6 +11,7 @@ app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
+
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
@@ -249,37 +250,48 @@ def return_from_db(item, question_number):
 	# finally:
 	#     conn.close()
 	#     return str(data)
-
-@app.route("/Patient/AddPatient", methods = ['POST', 'GET'])
-def patientAddDetails():
+@app.route("/SignUp", methods = ['GET'])
+def signup():
 	if request.method == 'GET':
 		return render_template('Signup.html')
+@app.route("/Patient/AddPatient", methods = ['POST'])
+def patientAddDetails():
 	if request.method == 'POST':
+		print("IN")
 		print(request.form)
 		patientName = request.form.get('patientName', default="Error")
 		Password = request.form.get('Password', default="Error")
 		Email = request.form.get('Email', default="Error")
-		print(patientName)
-		print(Password)
-		print(Email)
+		Gender = request.form.get('Gender', default="Error")
+		Age = request.form.get('Age', default="Error")
+		print(patientName,Password, Email, Gender, Age)
 		print("Inserting patient"+patientName)
+		msg = "FAILURE"
 		try:
 			conn = sqlite3.connect(DATABASE)
 			print("patient1")
 			cur = conn.cursor()
 			print("patient2")
-			cur.execute("INSERT INTO Patients ('patientName', 'Password', 'Email') VALUES (?,?,?)", (patientName, Password, Email) )
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName = ? AND Email=?))",(patientName,Email,))
+			exists = cur.fetchone()[0]
+			if exists == 0:
+				# print("inTO THIS")
+				cur.execute("INSERT INTO Patients ('patientName', 'Password', 'Email', 'Gender', 'Age') VALUES (?,?,?,?,?)", (patientName, Password, Email,Gender,Age))
+				conn.commit()
+				msg = "SUCCESS"
+			else:
+				msg = "EXISTS"
 			print("patient3")
-			conn.commit()
-			msg = "Record added successfully"
+
 		except Exception as e:
 			print(e)
 			conn.rollback()
-			msg = "Error adding patient"
+			print("SOMETHING WENT WRONG")
+			return "Something went wrong, please try again"			# msg = "Error adding patient"
 		finally:
 			conn.close()
-			return msg
-		return "This is kind of working i think"
+		print(msg)
+		return msg
 
 @app.route("/Login", methods = ['GET', 'POST'])
 def login():
