@@ -341,11 +341,43 @@ app.secret_key = ' abc123def456ghi789'
 def p_home():
 	return render_template("Patient.html")
 
+
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
-	return render_template("Clinition.html")
 
+
+	return render_template("Clinition.html", patients = get_all_patients())
+def get_all_patients():
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	cur.execute("SELECT patients.patientID,patients.patientName FROM FormSubmissions INNER JOIN patients ON patients.patientID = FormSubmissions.patientID WHERE FormSubmissions.completed = 'True'")
+	all_patients = cur.fetchall()
+	print("PATIENDS",all_patients)
+	conn.close()
+	return all_patients
+
+@app.route("/View/<int:user_id>")
+def user(user_id):
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	print("HEY")
+	print(user_id)
+	# Gets the date/time time the form was submitted with the id for the specific patient
+	cur.execute("SELECT FormSubmissions.dateCreated, FormSubmissions.id FROM FormSubmissions WHERE patientID = ?",(user_id,))
+	date_time = cur.fetchone()
+	# Gets all of the results for that one submisson (put in differnt app route)
+	cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	INNER JOIN Questions ON Questions.questionID = Results.questionID
+	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+	WHERE FormSubmissions.completed = "True" AND Results.patientID = ?;""",(user_id,))
+	# Gets the date created and completed forms from a specific patient
+	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = 36 AND completed = 'True';")
+	patient_result
+	print(f"Date is {date_time[0]} and time was {date_time[1]}")
+
+	return "THIS IS WORKING PERFECTLY"
 @app.route("/submitoption")
 def submitoption():
 	nextquestion = int(request.cookies.get('questionID'))
