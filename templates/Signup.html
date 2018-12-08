@@ -13,9 +13,16 @@
       <input type="text" placeholder="name" name = "patientName" required/>
       <input type="password" placeholder="password" name = "Password" required/>
       <input type="email" placeholder="email address" name = "Email" required/>
-      
-      <button>create</button>
-      <p class="message">Already registered? <a href="Login.html">Sign In</a></p>
+      <select name = "Gender" required>
+         <option value="Male">Male</option>
+         <option value="Female">Female</option>
+         <option value="Other">Other</option>
+         <option value="Prefer Not to Say">Prefer Not to Say</option>
+      </select>
+      <input type = "number" name = "Age" required/>
+
+      <button>Create</button>
+      <p class="message">Already registered? <a href="/Login">Sign In</a></p>
     </form>
     <span id="txt"></span>
   </div>
@@ -26,7 +33,12 @@
     var patientName = document.forms["signupform"]["patientName"].value;
     var Password = document.forms["signupform"]["Password"].value;
     var Email = document.forms["signupform"]["Email"].value;
-    params = 'patientName='+patientName+'&Password='+Password+'&Email='+Email;
+    var Gender = document.forms["signupform"]["Gender"].value;
+    var Age = document.forms["signupform"]["Age"].value;
+
+
+
+    params = 'patientName='+patientName+'&Password='+Password+'&Email='+Email+"&Gender="+Gender+"&Age="+Age;
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/Patient/AddPatient', true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

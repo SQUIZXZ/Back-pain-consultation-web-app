@@ -11,10 +11,7 @@ app.secret_key = os.urandom(24)
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-# <<<<<<< HEAD
-# =======
-# # <<<<<<< HEAD
-# >>>>>>> 1e94c57cb6ec6389431dc91fe3062f7deec97fcc
+
 @app.route("/", methods = ["GET","POST"])
 def show_home():
 	return redirect(url_for('static', filename='Login.html'))
@@ -25,12 +22,7 @@ def show_home():
 # 		username = request.form["username"]
 # 		password = request.form["password"]
 
-# <<<<<<< HEAD
-#
-# =======
-# =======
-# >>>>>>> 47e973543d97245dd0fe057696a547f237fc7295
-# >>>>>>> 1e94c57cb6ec6389431dc91fe3062f7deec97fcc
+
 @app.route("/getquestion", methods =["GET", "POST"])
 
 def getquestion():
@@ -270,9 +262,9 @@ def patientAddDetails():
 		patientName = request.form.get('patientName', default="Error")
 		Password = request.form.get('Password', default="Error")
 		Email = request.form.get('Email', default="Error")
-		print(patientName)
-		print(Password)
-		print(Email)
+		Gender = request.form.get('Gender', default="Error")
+		Age = request.form.get('Age', default="Error")
+		print(patientName,Password, Email, Gender, Age)
 		print("Inserting patient"+patientName)
 		msg = "FAILURE"
 		try:
@@ -280,10 +272,17 @@ def patientAddDetails():
 			print("patient1")
 			cur = conn.cursor()
 			print("patient2")
-			cur.execute("INSERT INTO Patients ('patientName', 'Password', 'Email') VALUES (?,?,?)", (patientName, Password, Email) )
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName = ? AND Email=?))",(patientName,Email,))
+			exists = cur.fetchone()[0]
+			if exists == 0:
+				# print("inTO THIS")
+				cur.execute("INSERT INTO Patients ('patientName', 'Password', 'Email', 'Gender', 'Age') VALUES (?,?,?,?,?)", (patientName, Password, Email,Gender,Age))
+				conn.commit()
+				msg = "SUCCESS"
+			else:
+				msg = "EXISTS"
 			print("patient3")
-			conn.commit()
-			msg = "SUCCESS"
+
 		except Exception as e:
 			print(e)
 			conn.rollback()
