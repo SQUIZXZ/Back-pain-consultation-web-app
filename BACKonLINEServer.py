@@ -23,9 +23,9 @@ def show_home():
 # 		password = request.form["password"]
 
 
-@app.route("/getquestion", methods =["GET", "POST"])
+@app.route("/getquestion/<int:form_id>", methods =["GET", "POST"])
 
-def getquestion():
+def getquestion(form_id):
 	global questionID
 	options_list, question, questionNum, template = return_question()
 	attemptNumber = 1
@@ -49,7 +49,7 @@ def getquestion():
 			# 		print(f"{result} has a value of {return_from_db(result,questionID)[0]}")
 			# 	#print(f"{result} has a value of {return_from_db(result)[0]}")
 
-			writethings( question_result,questionNum,attemptNumber)
+			writethings( question_result,questionNum,attemptNumber, form_id)
 			questionID = questionID + 1
 			options_list, question, questionNum, template = return_question()
 			#print("increment")
@@ -65,7 +65,7 @@ def getquestion():
 			#return resp
 	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum))
 	return resp
-def writethings(question_result,question_number,attemptNumber):
+def writethings(question_result,question_number,attemptNumber, form_id):
 	print("Values passed", question_result, question_number)
 	print("Working")
 	values = []
@@ -122,7 +122,7 @@ def writethings(question_result,question_number,attemptNumber):
 			text = question_result[0]
 			print("NEW TEXT",text)
 		print(f"before insert Q:{question_number[0]} Option ID: {option_ids} Text: {text} Option Values:{values} Attempt: {attemptNumber} ")
-		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','attemptNumber') VALUES (?,?,?,?,?,?)",(1,question_number[0],option_ids,values,text,attemptNumber))
+		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','formID') VALUES (?,?,?,?,?,?)",(39,question_number[0],option_ids,values,text,attemptNumber,form_id))
 		print('into the try333')
 		conn.commit()
 		conn.close()
@@ -353,7 +353,12 @@ def get_all_patients():
 	cur = conn.cursor()
 	cur.execute("SELECT patients.patientID,patients.patientName FROM FormSubmissions INNER JOIN patients ON patients.patientID = FormSubmissions.patientID WHERE FormSubmissions.completed = 'True'")
 	all_patients = cur.fetchall()
+
 	print("PATIENDS",all_patients)
+	all_patients = list(set(all_patients))
+	print(all_patients)
+	all_patients = sorted(all_patients, key=lambda x: x[1])
+	print(all_patients)
 	conn.close()
 	return all_patients
 
@@ -373,11 +378,29 @@ def user(user_id):
 	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
 	WHERE FormSubmissions.completed = "True" AND Results.patientID = ?;""",(user_id,))
 	# Gets the date created and completed forms from a specific patient
-	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = 36 AND completed = 'True';")
-	patient_result
+	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = ? AND completed = 'True'", (user_id,))
+	submissions_by_patient = cur.fetchall()
+	print(submissions_by_patient)
 	print(f"Date is {date_time[0]} and time was {date_time[1]}")
 
-	return "THIS IS WORKING PERFECTLY"
+	return render_template("Patient-Submissions.html", submissions = submissions_by_patient, user_id = user_id)
+
+
+@app.route("/View/<int:user_id>/<int:form_id>")
+def show_form(user_id,form_id):
+	print("THIS IS BEING USED")
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	INNER JOIN Questions ON Questions.questionID = Results.questionID
+	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+	WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
+	results = cur.fetchall()
+	print(results)
+	print(user_id,form_id)
+	return render_template("Submission.html", form_results = results)
+
 @app.route("/submitoption")
 def submitoption():
 	nextquestion = int(request.cookies.get('questionID'))

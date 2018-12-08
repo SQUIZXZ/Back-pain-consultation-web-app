@@ -1,0 +1,10 @@
+  {%extends 'test.html'%}
+{%block testBlock%}
+hey
+<ul>
+  {%for submission in submissions%}
+
+  <li><a href = "/View/{{user_id}}/{{submission[1]}}">{{submission[0]}}</a></li>
+  {%endfor%}
+</ul>
+{%endblock%}
