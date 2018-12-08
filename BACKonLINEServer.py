@@ -313,14 +313,14 @@ def login():
 			clinition_exists = cur.fetchone()
 			print("FETCHED")
 			cur.close()
-			session['logged_in'] = True
-			session['username'] = request.form['username']
 			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
 		except:
 			print("SOMETHING WENT WRONG")
 		if patient_exists[0] == 1:
+			session['usertype'] = 'Patient'
 			return redirect("Home/Patient")
 		elif clinition_exists[0] == 1:
+			session['usertype'] = 'Admin'
 			return redirect("Home/Clinition")
 		else:
 			return redirect("/Login")
@@ -329,7 +329,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-   session.pop('logged_in', None)
+   session.pop('usertype', None)
    flash("You were logged out")
    return redirect(url_for('login'))
 
