@@ -23,9 +23,9 @@ def show_home():
 # 		password = request.form["password"]
 
 
-@app.route("/getquestion", methods =["GET", "POST"])
+@app.route("/getquestion/<int:form_id>", methods =["GET", "POST"])
 
-def getquestion():
+def getquestion(form_id):
 	global questionID
 	options_list, question, questionNum, template = return_question()
 	attemptNumber = 1
@@ -49,7 +49,7 @@ def getquestion():
 			# 		print(f"{result} has a value of {return_from_db(result,questionID)[0]}")
 			# 	#print(f"{result} has a value of {return_from_db(result)[0]}")
 
-			writethings( question_result,questionNum,attemptNumber)
+			writethings( question_result,questionNum,attemptNumber, form_id)
 			questionID = questionID + 1
 			options_list, question, questionNum, template = return_question()
 			#print("increment")
@@ -65,7 +65,7 @@ def getquestion():
 			#return resp
 	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum))
 	return resp
-def writethings(question_result,question_number,attemptNumber):
+def writethings(question_result,question_number,attemptNumber, form_id):
 	print("Values passed", question_result, question_number)
 	print("Working")
 	values = []
@@ -122,7 +122,7 @@ def writethings(question_result,question_number,attemptNumber):
 			text = question_result[0]
 			print("NEW TEXT",text)
 		print(f"before insert Q:{question_number[0]} Option ID: {option_ids} Text: {text} Option Values:{values} Attempt: {attemptNumber} ")
-		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','attemptNumber') VALUES (?,?,?,?,?,?)",(1,question_number[0],option_ids,values,text,attemptNumber))
+		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','formID') VALUES (?,?,?,?,?,?)",(39,question_number[0],option_ids,values,text,attemptNumber,form_id))
 		print('into the try333')
 		conn.commit()
 		conn.close()
@@ -311,24 +311,27 @@ def login():
 			print("AFTER")
 			clinition_exists = cur.fetchone()
 			print("FETCHED")
-			cur.close()
+
+			session['logged_in'] = True
+			session['username'] = request.form['username']
 			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
 		except:
 			print("SOMETHING WENT WRONG")
 		if patient_exists[0] == 1:
-			session['usertype'] = 'Patient'
-			return redirect("Home/Patient")
+			cur.execute("SELECT patientID FROM Patients WHERE (patientName = ? AND Password=?)",(username,password,))
+			id = cur.fetchone()[0]
+			return redirect("Home/Patient/"+str(id))
 		elif clinition_exists[0] == 1:
-			session['usertype'] = 'Admin'
+
 			return redirect("Home/Clinition")
 		else:
-			return redirect("/Login")
+			msg = "The email/password combination is invalid"
 
 	return render_template('Login.html', msg='')
 
 @app.route('/logout')
 def logout():
-   session.pop('usertype', None)
+   session.pop('logged_in', None)
    flash("You were logged out")
    return redirect(url_for('login'))
 
@@ -337,14 +340,107 @@ def checkCredentials(uName, pw):
 
 app.secret_key = ' abc123def456ghi789'
 ##### patient route
-@app.route("/Home/Patient", methods = ["GET"])
-def p_home():
-	return render_template("Patient.html")
+@app.route("/Home/Patient/<int:id>", methods = ["GET"])
+def p_home(id):
 
+	return render_template("Patient.html", id = id)
+
+@app.route("/New-Assessment")
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
-	return render_template("Clinition.html")
+
+
+	return render_template("Clinition.html", patients = get_all_patients())
+def get_all_patients():
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	cur.execute("SELECT patients.patientID,patients.patientName FROM FormSubmissions INNER JOIN patients ON patients.patientID = FormSubmissions.patientID WHERE FormSubmissions.completed = 'True'")
+	all_patients = cur.fetchall()
+
+	print("PATIENDS",all_patients)
+	all_patients = list(set(all_patients))
+	print(all_patients)
+	all_patients = sorted(all_patients, key=lambda x: x[1])
+	print(all_patients)
+	conn.close()
+	return all_patients
+
+@app.route("/View/<int:user_id>")
+def user(user_id):
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	print("HEY")
+	print(user_id)
+	# Gets the date/time time the form was submitted with the id for the specific patient
+	cur.execute("SELECT FormSubmissions.dateCreated, FormSubmissions.id FROM FormSubmissions WHERE patientID = ?",(user_id,))
+	date_time = cur.fetchone()
+	# Gets all of the results for that one submisson (put in differnt app route)
+	cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	INNER JOIN Questions ON Questions.questionID = Results.questionID
+	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+	WHERE FormSubmissions.completed = "True" AND Results.patientID = ?;""",(user_id,))
+	# Gets the date created and completed forms from a specific patient
+	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = ? AND completed = 'True'", (user_id,))
+	submissions_by_patient = cur.fetchall()
+	print(submissions_by_patient)
+	print(f"Date is {date_time[0]} and time was {date_time[1]}")
+
+	return render_template("Patient-Submissions.html", submissions = submissions_by_patient, user_id = user_id)
+
+
+@app.route("/View/<int:user_id>/<int:form_id>")
+def show_form(user_id,form_id):
+	print("THIS IS BEING USED")
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	# cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+	# FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	# INNER JOIN Questions ON Questions.questionID = Results.questionID
+	# INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+	# WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
+	cur.execute("""SELECT QuestionTypes.questionType, Questions.question, Results.questionID, Results.optionID, Results.textField
+	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	INNER JOIN Questions ON Questions.questionID = Results.questionID
+	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+
+	WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
+
+	results = cur.fetchall()
+	results = [list(elem) for elem in results]
+	options_list = [item[3] for item in results]
+	option_texts = []
+	for options in options_list:
+
+		print("WHATS GOING ON", options)
+		split_options = options.split(",")
+		print("AFTER SPLIT", split_options)
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		if len(split_options)>1:
+			values = []
+			for option_id in split_options:
+				print("OPTSOIN", option_id)
+				cur.execute("SELECT optionText FROM Options WHERE optionID = ?", (option_id,))
+				option_text = cur.fetchone()[0]
+				print("FETCHED",option_text)
+				values.append(option_text)
+
+			option_texts.append(values)
+			print("multiple")
+		else:
+			cur.execute("SELECT optionText FROM Options WHERE optionID = ?", (split_options[0],))
+			option_text = cur.fetchone()[0]
+			option_texts.append(option_text)
+	print("FINALLY",option_texts)
+	print("BEFORE INSERTS",results)
+	for x in range (0, len(results)):
+		results[x][3] = option_texts[x]
+	print(results)
+	# print("LIST LIST", options_list)
+	print(user_id,form_id)
+	return render_template("Submission.html", form_results = results)
 
 @app.route("/submitoption")
 def submitoption():
