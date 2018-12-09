@@ -9,20 +9,23 @@
 
   <form action="" method = "POST" name="question-options">
     <table class="table">
+      <br/>
       {%for value in options%}
       <tr>
-        <td>
+        <td><br/>
           <label class="radios">
             <input type="radio" name="option" value="{{value}}" required = True>
             {{value}}
+            <span class="checkmark"></span>
           </label>
 
         </td>
       </tr>
       {%endfor%}
     </table>
-    <input type="submit" name="Back" value="< Back" formnovalidate>
-    <input type="submit" name="Next" value="Next >">
+    <br/>
+    <input class="question-button" type="submit" name="Back" value="Back" formnovalidate>
+    <input class="question-button" type="submit" name="Next" value="Next">
 
   </form>
   <!-- <a href = "/"> Next </a> -->

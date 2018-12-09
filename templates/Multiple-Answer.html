@@ -7,22 +7,25 @@
   <!-- <p>Options {{options}}</p> -->
   <!-- <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
 
-  <form action="" onsubmit="return valquestion()" method = "POST" name="question-options" id = "q_form">
+  <form action="/getquestion" onsubmit="return valquestion()" method = "POST" name="question-options" id = "q_form">
     <table class="table">
+      <br/>
       {%for value in options%}
       <tr>
-        <td>
-          <label class="checkbox">
-            <input class="box" type="checkbox" name="option" value="{{value}}" >
+        <td><br/>
+          <label class="radios">
+            <input type="checkbox" name="option" value="{{value}}" >
             {{value}}
+            <span class="checkmark"></span>
           </label>
 
         </td>
       </tr>
       {%endfor%}
     </table>
-    <input type="submit" name="Back" value="< Back" onclick="clicked='Back'" formnovalidate>
-    <input type="submit" value="Next > " name="Next" onclick="clicked='Next'">
+    <br/>
+    <input class="question-button" type="submit" name="Back" value="Back" onclick="clicked='Back'" formnovalidate>
+    <input class="question-button" type="submit" value="Next " name="Next" onclick="clicked='Next'">
   </form>
   <script>
     var options_stuff = document.forms["question-options"].elements["option"];

@@ -59,7 +59,7 @@
 
         }else if(response_text === "EXISTS"){
           // Response text for if the user already exists in the database
-          alert("The patient already exists, please login with your login details");
+          alert("The patient already exists, please check email for their login details");
         document.getElementByID("txt").innerHTML = xhttp.responseText;
         }else {
           // Response text for if the server gets an error while going into the DB
