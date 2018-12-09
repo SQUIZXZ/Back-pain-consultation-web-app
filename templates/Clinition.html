@@ -1,10 +1,13 @@
+{%extends 'test.html'%}
 THIS IS A REDIRECT BLANK PAGE
 {% block logouttext %}
 
 {% endblock %}
+{%block testBlock%}
 <ul class="patients-list">
 {%for patient in patients%}
 <li><a href="/View/{{patient[0]}}">{{patient[1]}}</a>
 </li>
 {%endfor%}
 <ul>
+  {% endblock %}
