@@ -1,29 +1,35 @@
 <html>
 
 <head>
-  <link rel="stylesheet"type="text/css" href="CssforTemplates.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='CssforTemplates.css') }}">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
   <title>BACKonLINE</title>
 </head>
-<img src = "Cardiff.jpg" id="Cardiff" style="width:100px;height:100px;">
-<img src = "Arthritis.jpg" id="Arthritis" style="width:100px;height:100px;">
 
 <body>
-  <h1> BACKonLINE </h1>
+  <header class="header">
+    <img class="logo" src = "static/Cardiff.jpg" id="Cardiff" style="width:100px;height:100px;">
+    <img class="logo" src = "static/Arthritis.jpg" id="Arthritis" style="width:100px;height:100px;">
+    <div class="title">
+      <center><h1 class="header-title">BACKonLINE™</h1></center>
+    </div>
+  </header>
 
-  <nav>
-    <a href = ""> Home </a>
-    <a href = ""> Profile </a>
-  </nav>
+
+  <center><nav class="nav-bar">
+    <a href = "">Home</a>
+    <a href = "">Profile</a>
+  </nav></center>
 
   <br><br><br>
 
-<div id="main">
+<center><div class="question" id="main"><br/>
 {%block testBlock%}
   <p>Hello people</p>
 {%endblock%}
 
 {% block numBlock %}{% endblock %}
-</div>
+</div></center>
    </body>
 </body>
 
