@@ -2,27 +2,28 @@
 
 
 <head>
-<link rel="stylesheet" href="{{ url_for('static', filename='global.css') }}">
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='CssforTemplates.css') }}">
 </head>
 
-<body>
+<body style="background-color: #DEE2E5">
 
 <div class="login-page">
   <div class="form">
+    <h1 class="form-title">SIGN UP</h1>
     <form id='signupform' onsubmit="return loadPatient()" class="register-form">
-      <input type="text" placeholder="name" name = "patientName" required/>
-      <input type="password" placeholder="password" name = "Password" required/>
-      <input type="email" placeholder="email address" name = "Email" required/>
+      <input type="text" placeholder="Name" name = "patientName" required/>
+      <input type="password" placeholder="Password" name = "Password" required/>
+      <input type="email" placeholder="Email" name = "Email" required/>
       <select name = "Gender" required>
          <option value="Male">Male</option>
          <option value="Female">Female</option>
          <option value="Other">Other</option>
          <option value="Prefer Not to Say">Prefer Not to Say</option>
-      </select>
-      <input type = "number" name = "Age" required/>
-
+      </select><br/><br/>
+      <input placeholder="Age" type = "number" name = "Age" required/>
       <button>Create</button>
-      <p class="message">Already registered? <a href="/Login">Sign In</a></p>
+      <p class="message">Already registered? <a href="/Login">LOGIN</a></p>
     </form>
     <span id="txt"></span>
   </div>
