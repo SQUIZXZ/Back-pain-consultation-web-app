@@ -311,18 +311,21 @@ def login():
 			print("AFTER")
 			clinition_exists = cur.fetchone()
 			print("FETCHED")
-			cur.close()
+
 			session['logged_in'] = True
 			session['username'] = request.form['username']
 			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
 		except:
 			print("SOMETHING WENT WRONG")
 		if patient_exists[0] == 1:
-			return redirect("Home/Patient")
+			cur.execute("SELECT patientID FROM Patients WHERE (patientName = ? AND Password=?)",(username,password,))
+			id = cur.fetchone()[0]
+			return redirect("Home/Patient/"+str(id))
 		elif clinition_exists[0] == 1:
+
 			return redirect("Home/Clinition")
 		else:
-			return redirect("/Login")
+			msg = "The email/password combination is invalid"
 
 	return render_template('Login.html', msg='')
 
@@ -337,11 +340,12 @@ def checkCredentials(uName, pw):
 
 app.secret_key = ' abc123def456ghi789'
 ##### patient route
-@app.route("/Home/Patient", methods = ["GET"])
-def p_home():
-	return render_template("Patient.html")
+@app.route("/Home/Patient/<int:id>", methods = ["GET"])
+def p_home(id):
 
+	return render_template("Patient.html", id = id)
 
+@app.route("/New-Assessment")
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
@@ -391,13 +395,50 @@ def show_form(user_id,form_id):
 	print("THIS IS BEING USED")
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
-	cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+	# cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+	# FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	# INNER JOIN Questions ON Questions.questionID = Results.questionID
+	# INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+	# WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
+	cur.execute("""SELECT QuestionTypes.questionType, Questions.question, Results.questionID, Results.optionID, Results.textField
 	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
 	INNER JOIN Questions ON Questions.questionID = Results.questionID
 	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+
 	WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
+
 	results = cur.fetchall()
+	results = [list(elem) for elem in results]
+	options_list = [item[3] for item in results]
+	option_texts = []
+	for options in options_list:
+
+		print("WHATS GOING ON", options)
+		split_options = options.split(",")
+		print("AFTER SPLIT", split_options)
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		if len(split_options)>1:
+			values = []
+			for option_id in split_options:
+				print("OPTSOIN", option_id)
+				cur.execute("SELECT optionText FROM Options WHERE optionID = ?", (option_id,))
+				option_text = cur.fetchone()[0]
+				print("FETCHED",option_text)
+				values.append(option_text)
+
+			option_texts.append(values)
+			print("multiple")
+		else:
+			cur.execute("SELECT optionText FROM Options WHERE optionID = ?", (split_options[0],))
+			option_text = cur.fetchone()[0]
+			option_texts.append(option_text)
+	print("FINALLY",option_texts)
+	print("BEFORE INSERTS",results)
+	for x in range (0, len(results)):
+		results[x][3] = option_texts[x]
 	print(results)
+	# print("LIST LIST", options_list)
 	print(user_id,form_id)
 	return render_template("Submission.html", form_results = results)
 

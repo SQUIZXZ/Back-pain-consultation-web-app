@@ -2,17 +2,20 @@
 
 <head>
   <link rel="stylesheet"type="text/css" href="CssforTemplates.css">
+  <img src="{{ url_for('static', filename = 'Cardiff.jpg') }}" width="100" height="100" >
+  <img src="{{ url_for('static', filename = 'Arthritis.jpg') }}" width="100" height="100" >
   <title>BACKonLINE</title>
 </head>
-<img src = "Cardiff.jpg" id="Cardiff" style="width:100px;height:100px;">
-<img src = "Arthritis.jpg" id="Arthritis" style="width:100px;height:100px;">
+<!-- <img src = "/templates/Cardiff.jpg" id="Cardiff" style="width:100px;height:100px;">
+<img src = "Arthritis.jpg" id="Arthritis" style="width:100px;height:100px;"> -->
 
 <body>
   <h1> BACKonLINE </h1>
+  ID IS {{id}}
 
   <nav>
-    <a href = ""> Home </a>
-    <a href = ""> Profile </a>
+    <a href = "/Login"> Home </a>
+    <a href = "/Home/Patient/{{id}}"> Profile </a>
   </nav>
 
   <br><br><br>
@@ -21,9 +24,9 @@
   <p>Hello people</p>
 {%endblock%}
 
-{% block numBlock %}{% endblock %}
+{% block numBlock %}
+{% endblock %}
 
-   </body>
 </body>
 
 </html>

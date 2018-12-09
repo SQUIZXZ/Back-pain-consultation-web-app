@@ -23,10 +23,77 @@
           </ul>
         </td>
       </tr>
-
+      <div class="range">
+  <!-- <input type="range" min="0" max="5" value="2" class="slider">
+  <div class="sliderticks">
+    <p>0</p>
+    <p>1</p>
+    <p>2</p>
+    <p>3</p>
+    <p>4</p>
+    <p>5</p>
+  </div>
+</div> -->
     </table>
     <input type="submit" name="submit_button" value="< Back" formnovalidate>
     <input type="submit" name="submit_button" value="Next >">
   </form>
   <!-- <a href = "/"> Next </a> -->
+
+  <style>
+    * {
+  box-sizing: border-box;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80%;
+  height: 25px;
+  background: #D3D3D3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #FF0000;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #FF0000;
+  cursor: pointer;
+}
+
+.sliderticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.sliderticks p {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 1px;
+  background: #D3D3D3;
+  height: 10px;
+  line-height: 40px;
+  margin: 0 0 20px 0;
+}
+  </style>
+
   {%endblock%}

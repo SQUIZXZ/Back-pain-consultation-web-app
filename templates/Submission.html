@@ -1,5 +1,37 @@
   {%extends 'test.html'%}
 {%block testBlock%}
-hey
-{{form}}
+
+{%for question in form_results%}
+<article class="question-box">
+  <h2>Question {{question[2]}}:</h2>
+  <p>{{question[1]}}</p>
+<form>
+{%if question[0] == "Single-Answer"%}
+
+<label class="radios">
+<input type="radio" name="option"  checked = "checked" disabled  >
+{{question[3]}}
+</label>
+
+
+
+{%elif question[0] == "Multiple-Answer"%}
+{%for option in question[3]%}
+<label class="checkbox">
+  <input class="box" type="checkbox" name="option" checked = "checked"  disabled  >
+  {{option}}
+</label>
+{%endfor%}
+
+{%elif question[0] == "Text-Field"%}
+<label class="text-field">
+  <input type="text" name="option" value="{{question[4]}}" readonly >
+</label>
+
+{%elif question[0] == "Slider"%}
+<li>{{question}} Slider answer</li>
+</article>
+{%endif%}
+</form>
+{%endfor%}
 {%endblock%}
