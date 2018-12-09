@@ -7,7 +7,7 @@ import time
 DATABASE = "BACKonLINE.db"
 conn = sqlite3.connect(DATABASE)
 cur = conn.cursor()
-questionID = 1
+# questionID = 1
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
@@ -25,11 +25,12 @@ def show_home():
 # 		password = request.form["password"]
 
 
-@app.route("/getquestion/<int:form_id>", methods =["GET", "POST"])
+@app.route("/getquestion/<int:patient_id>/<int:form_id>/<int:question_number>", methods =["GET", "POST"])
 
-def getquestion(form_id):
-	global questionID
-	options_list, question, questionNum, template = return_question()
+def getquestion(form_id,patient_id,question_number):
+	# global questionID
+	print("CURRENT QUETSOPN", question_number)
+	options_list, question, questionNum, template = return_question(question_number)
 	attemptNumber = 1
 
 
@@ -51,23 +52,29 @@ def getquestion(form_id):
 			# 		print(f"{result} has a value of {return_from_db(result,questionID)[0]}")
 			# 	#print(f"{result} has a value of {return_from_db(result)[0]}")
 
-			writethings( question_result,questionNum,attemptNumber, form_id)
-			questionID = questionID + 1
-			options_list, question, questionNum, template = return_question()
+			writethings(patient_id, question_result,questionNum,attemptNumber, form_id)
+			# questionID = questionID + 1
+			question_number += 1
+			options_list, question, questionNum, template = return_question(question_number)
 			#print("increment")
+			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(question_number))
 
 			#resp.set_cookie('questionID', str(questionID))
 			#return resp
 		elif "Back" in request.form:
 			#print("back pressed")
-			questionID = questionID - 1
-			options_list, question, questionNum, template = return_question()
+			# questionID = questionID - 1
+			question_number -= 1
+			if question_number == 0:
+				question_number = 1
+			options_list, question, questionNum, template = return_question(question_number)
 			#print("decrement")
 			#resp.set_cookie('questionID', str(questionID))
 			#return resp
+			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(question_number))
 	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum))
 	return resp
-def writethings(question_result,question_number,attemptNumber, form_id):
+def writethings(patient_id,question_result,question_number,attemptNumber, form_id):
 	print("Values passed", question_result, question_number)
 	print("Working")
 	values = []
@@ -124,7 +131,7 @@ def writethings(question_result,question_number,attemptNumber, form_id):
 			text = question_result[0]
 			print("NEW TEXT",text)
 		print(f"before insert Q:{question_number[0]} Option ID: {option_ids} Text: {text} Option Values:{values} FORM: {form_id} ")
-		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','formID') VALUES (?,?,?,?,?,?)",(39,question_number[0],option_ids,values,text,form_id))
+		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','form_id') VALUES (?,?,?,?,?,?)",(patient_id,question_number[0],option_ids,values,text,form_id))
 		print('into the try333')
 		conn.commit()
 		conn.close()
@@ -168,23 +175,23 @@ def writethings(question_result,question_number,attemptNumber, form_id):
 
 
 
-def return_question():
-	global questionID
+def return_question(question_number):
+	# global questionID
 	#questionID = int(request.cookies.get('questionID'))
 	#print("testQ",questionID)
 
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
 
-	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (questionID,))
+	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (question_number,))
 	questionNum = cur.fetchone()
-	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
+	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (question_number,))
 	question = cur.fetchone()
-	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
+	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (question_number,))
 	options = cur.fetchall()
 
 	#print(question,options,questionNum)
-	cur.execute("SELECT questionType FROM Questions WHERE questionID =?",(questionID,))
+	cur.execute("SELECT questionType FROM Questions WHERE questionID =?",(question_number,))
 	type = cur.fetchone()[0]
 	print("TYPEID",type)
 	cur.execute("SELECT questionType FROM QuestionTypes WHERE typeID =?",(type))
@@ -354,22 +361,34 @@ def new_surver(patient_id):
 	print("USER_ID", patient_id)
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
+
 	i = datetime.now()
 	current_date = i.strftime("%Y/%m/%d")
 	stringed_date = current_date.split("/")
+
 	current_time = i.strftime("%H:%M:%S:%f")
-
 	stringed_time = current_time.split(":")
+
+	stringed_date_time = current_date + "," + current_time
+	cur.execute("INSERT INTO FormSubmissions (patientID, completed, dateCreated) VALUES (?,?,?)",(patient_id,'False',stringed_date_time,))
+	print("DATE-TIME", current_date + "," + current_time,stringed_date_time)
+	form_id = cur.lastrowid
+	conn.commit()
+	conn.close()
+	print("FORM ID", form_id)
 	past_date = datetime(int(stringed_date[0]),int(stringed_date[1]),int(stringed_date[2]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
-	time.sleep(10)
+	
 	difference = datetime.utcnow() - past_date
+	if (difference.days == 0):
+		msg = "Date is within 24 hours"
 
+	else:
+		msg = "You can no longer edit this submisssion"
 	print("TIME DIFFERENCE", difference)
-
 	print(i,past_date)
 
 	print (current_date,current_time)
-	return ((current_date),(current_time))
+	return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(1))
 
 
 
@@ -428,11 +447,12 @@ def show_form(user_id,form_id):
 	# INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
 	# WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
 	cur.execute("""SELECT QuestionTypes.questionType, Questions.question, Results.questionID, Results.optionID, Results.textField
-	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID AND Results.form_id = FormSubmissions.id
 	INNER JOIN Questions ON Questions.questionID = Results.questionID
 	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
 
-	WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
+	WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?
+	ORDER BY Results.questionID;""",(form_id,user_id,))
 
 	results = cur.fetchall()
 	results = [list(elem) for elem in results]
