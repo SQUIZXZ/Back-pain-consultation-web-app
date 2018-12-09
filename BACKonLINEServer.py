@@ -1,6 +1,8 @@
 import os
 from flask import Flask, redirect, request, render_template, make_response, escape, session, url_for, flash
 import sqlite3
+from datetime import datetime
+import time
 
 DATABASE = "BACKonLINE.db"
 conn = sqlite3.connect(DATABASE)
@@ -121,8 +123,8 @@ def writethings(question_result,question_number,attemptNumber, form_id):
 		if question_number[0] == 3:
 			text = question_result[0]
 			print("NEW TEXT",text)
-		print(f"before insert Q:{question_number[0]} Option ID: {option_ids} Text: {text} Option Values:{values} Attempt: {attemptNumber} ")
-		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','formID') VALUES (?,?,?,?,?,?)",(39,question_number[0],option_ids,values,text,attemptNumber,form_id))
+		print(f"before insert Q:{question_number[0]} Option ID: {option_ids} Text: {text} Option Values:{values} FORM: {form_id} ")
+		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','formID') VALUES (?,?,?,?,?,?)",(39,question_number[0],option_ids,values,text,form_id))
 		print('into the try333')
 		conn.commit()
 		conn.close()
@@ -183,8 +185,9 @@ def return_question():
 
 	#print(question,options,questionNum)
 	cur.execute("SELECT questionType FROM Questions WHERE questionID =?",(questionID,))
-	# type = cur.fetchone()
-	cur.execute("SELECT questionType FROM QuestionTypes WHERE typeID =?",(cur.fetchone()))
+	type = cur.fetchone()[0]
+	print("TYPEID",type)
+	cur.execute("SELECT questionType FROM QuestionTypes WHERE typeID =?",(type))
 	question_type = cur.fetchone()[0]
 	cur.close()
 	if question_type == "Multiple-Answer":
@@ -264,6 +267,7 @@ def patientAddDetails():
 		Email = request.form.get('Email', default="Error")
 		Gender = request.form.get('Gender', default="Error")
 		Age = request.form.get('Age', default="Error")
+
 		print(patientName,Password, Email, Gender, Age)
 		print("Inserting patient"+patientName)
 		msg = "FAILURE"
@@ -345,7 +349,30 @@ def p_home(id):
 
 	return render_template("Patient.html", id = id)
 
-@app.route("/New-Assessment")
+@app.route("/New-Assessment/<int:patient_id>")
+def new_surver(patient_id):
+	print("USER_ID", patient_id)
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	i = datetime.now()
+	current_date = i.strftime("%Y/%m/%d")
+	stringed_date = current_date.split("/")
+	current_time = i.strftime("%H:%M:%S:%f")
+
+	stringed_time = current_time.split(":")
+	past_date = datetime(int(stringed_date[0]),int(stringed_date[1]),int(stringed_date[2]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
+	time.sleep(10)
+	difference = datetime.utcnow() - past_date
+
+	print("TIME DIFFERENCE", difference)
+
+	print(i,past_date)
+
+	print (current_date,current_time)
+	return ((current_date),(current_time))
+
+
+
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
