@@ -1,8 +1,14 @@
 {%extends 'test.html'%}
+{% block navbar%}
+<center><nav class="nav-bar">
+  <a href = > <i class="fa fa-fw fa-user"></i>PROFILE</a>
+  <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
+</nav></center>
+{% endblock %}
 {%block testBlock%}
-THIS IS YOUR ID: {{id}}<br/>
-<button class = "start-assessment" onclick = "location.href='/New-Assessment/{{id}}'">Start New Assessment</button>
-<button class = "edit-submission" onclick = "edit_submissions()">Edit Submissions</button>
+THIS IS YOUR ID: {{id}}<br/><br/>
+<button class = "patient-button" onclick = "location.href='/New-Assessment/{{id}}'">Start New Assessment</button><br/><br/>
+<button class = "patient-button" onclick = "edit_submissions()">Edit Submissions</button>
 
 <script>
   edit_submissions(){
