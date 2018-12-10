@@ -280,3 +280,12 @@ h1{
 .submission-row{
   cursor:pointer;
 }
+
+.information{
+  text-align: left;
+  font-size: 20;
+}
+
+.information ul{
+  list-style: none;
+}

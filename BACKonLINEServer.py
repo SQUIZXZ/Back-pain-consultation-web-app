@@ -536,8 +536,29 @@ def p_home(id):
 	elif session.get('usertype') != 'Patient':
 		return "ERROR - Permission required"
 
+	try:
+		conn = sqlite3.connect(DATABASE)
+		print("connected")
+		cur = conn.cursor()
+		print("cursor")
+		cur.execute("SELECT patientName,Email,Age,Gender FROM Patients WHERE patientID=?",(id,))
+		print("executed")
+		info = cur.fetchone()
+		print(info)
+		conn.commit()
+		msg = "Retrieved"
+	except:
+		conn.rollback()
+		print("rollback")
+		msg = "error"
+	finally:
+		conn.close()
 
-	return render_template("Patient.html", id = id)
+
+
+
+
+	return render_template("Patient.html", id = id, Email = info[1], Age = info[2], Gender = info[3], Name = info[0])
 @app.route("/Home/Patient/<int:user_id>/Edit_Submissions")
 def edit_submission(user_id):
 	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
