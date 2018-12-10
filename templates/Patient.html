@@ -7,6 +7,14 @@
 {% endblock %}
 {%block testBlock%}
 Your personal ID: {{id}}<br/><br/>
+<div class = "information">
+  <ul>
+<li>Name: {{Name}}</li><br/>
+<li>Email: {{Email}}</li><br/>
+<li>Age: {{Age}}</li><br/>
+<li>Gender: {{Gender}}</li><br/>
+  </ul>
+</div>
 <button class = "patient-button" onclick = "location.href='/New-Assessment/{{id}}'">Start New Assessment</button><br/><br/>
 <button class = "patient-button" onclick = "location.href='/Home/Patient/{{id}}/Edit_Submissions'">Edit Submissions</button>
 
