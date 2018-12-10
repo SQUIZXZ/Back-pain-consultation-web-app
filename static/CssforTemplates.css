@@ -245,6 +245,7 @@ h1{
   font-family: 'Montserrat', sans-serif;
 }
 
+<<<<<<< HEAD
 .patient-button {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
@@ -258,4 +259,20 @@ h1{
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
+=======
+.slideroptions {
+  float: left;
+  padding: 0 1em;
+  text-align: center;
+  font-size: 15;
+}
+
+.slideroptions input{
+  width: 20px;
+  height: 20px;
+}
+
+#slider{
+  display: inline-block;
+>>>>>>> acd5b6b14bd9184ee64eec75632f2083b8daf169
 }

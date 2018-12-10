@@ -134,6 +134,12 @@ h1{
   text-align: center;
 }
 
+<<<<<<< HEAD
 .patients-list:hover {
   background-color: green;
+=======
+#slider{
+  display: inline-block;
+
+>>>>>>> acd5b6b14bd9184ee64eec75632f2083b8daf169
 }
