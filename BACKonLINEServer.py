@@ -3,6 +3,7 @@ from flask import Flask, redirect, request, render_template, make_response, esca
 import sqlite3
 from datetime import datetime
 import time
+from functools import wraps
 
 DATABASE = "BACKonLINE.db"
 conn = sqlite3.connect(DATABASE)
@@ -351,6 +352,9 @@ def login():
 			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName = ? AND Password=?))",(username,password,))
 			print("AFTER")
 			patient_exists = cur.fetchone()
+			session['logged_in'] = True
+			session['username'] = request.form['username']
+			
 			print("BEFORE")
 			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
 			print("AFTER")
@@ -376,6 +380,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+   session.pop('logged_in', None)
    session.pop('logged_in', None)
    flash("You were logged out")
    return redirect(url_for('login'))
@@ -429,9 +434,8 @@ def new_surver(patient_id):
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
-
-
 	return render_template("Clinition.html", patients = get_all_patients())
+
 def get_all_patients():
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()

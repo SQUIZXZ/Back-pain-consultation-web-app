@@ -102,22 +102,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  -webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box;
-border:2px solid;
-padding-right:3px;
-margin:0px;
-margin-top: 10px;
-width:100px;
-background-color: white;
-text-decoration: none;
-text-align:center;
-display:inline-block;
-width:100px;
-color:black;
-}
+
 
 nav{
   width:1250px;
@@ -147,4 +132,14 @@ h1{
 
 #main{
   text-align: center;
+}
+
+<<<<<<< HEAD
+.patients-list:hover {
+  background-color: green;
+=======
+#slider{
+  display: inline-block;
+
+>>>>>>> acd5b6b14bd9184ee64eec75632f2083b8daf169
 }
