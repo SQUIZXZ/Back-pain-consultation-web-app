@@ -75,7 +75,7 @@ def getquestion(form_id,patient_id,question_number):
 			#resp.set_cookie('questionID', str(questionID))
 			#return resp
 			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(question_number))
-	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum))
+	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum, id = patient_id))
 	return resp
 def writethings(patient_id,question_result,question_number,attemptNumber, form_id):
 	print("Values passed", question_result, question_number)
@@ -354,7 +354,7 @@ def login():
 			patient_exists = cur.fetchone()
 			session['logged_in'] = True
 			session['username'] = request.form['username']
-			
+
 			print("BEFORE")
 			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
 			print("AFTER")
