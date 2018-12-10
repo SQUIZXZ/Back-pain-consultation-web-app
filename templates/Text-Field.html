@@ -12,14 +12,15 @@
   <p>  {{ question }}</p>
   <!-- <p>Options {{options}}</p> -->
   <!-- <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
-
+  <meta content = "{{selected_options}}" property = 'options_text'>
+  <meta content = "{{selected_texts}}" property = 'text_text'>
   <form action="" method = "POST" name="question-options">
     <table class="table">
 
       <tr>
         <td>
           <label class="text-field">
-            <input type="text" name="option" value="" required=True>
+            <input id = "text-box" type="text" name="option" value="" required=True>
           </label>
 
         </td>
@@ -29,5 +30,32 @@
     <input class="question-button" type="submit" name="Back" value="Back" formnovalidate>
     <input class="question-button" type="submit" name="Next" value="Next">
   </form>
+  <script>
+    var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
+    var text_boxes = document.querySelector("meta[property='text_text']").getAttribute("content");
+    if (selected_boxes ==="[]"){}else{
+    selected_boxes = " "+selected_boxes;
+    var selected_boxes = selected_boxes.slice(1,-1);
+    var varray = selected_boxes.split(",");
+    // alert(what)
+    // alert(varray);
+    len =varray.length;
+    for (var i = 0; i<len; i++){
+
+      // alert(varray[i]);
+      var item = varray[i].slice(2,-1);
+      // alert(item);
+      // alert(item === "Codeine");
+      // alert(item.toString());
+      if( item ==="Text Field"){
+        // alert("TEXT BROTHER");
+        document.getElementById("text-box").value = text_boxes.slice(2,-2).toString();
+        // alert(text_boxes.slice(2,-2).toString());
+      }
+      var checkbox_select = document.getElementById(item.toString());
+      checkbox_select.checked = true;
+    }
+  }
+  </script>
   <!-- <a href = "/"> Next </a> -->
   {%endblock%}

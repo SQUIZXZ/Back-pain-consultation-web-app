@@ -31,7 +31,8 @@ def show_home():
 def getquestion(form_id,patient_id,question_number):
 	# global questionID
 	print("CURRENT QUETSOPN", question_number)
-	options_list, question, questionNum, template = return_question(question_number)
+	options_list, question, questionNum, template, option_texts, fetched_texts = return_question(question_number,patient_id,form_id)
+	print("FETHCED ££££", option_texts, fetched_texts)
 	attemptNumber = 1
 
 
@@ -58,7 +59,7 @@ def getquestion(form_id,patient_id,question_number):
 			question_number += 1
 			if question_number > 39:
 				question_number = 39
-			options_list, question, questionNum, template = return_question(question_number)
+			# options_list, question, questionNum, template = return_question(question_number,patient_id,form_id)
 			#print("increment")
 			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(question_number))
 
@@ -70,12 +71,12 @@ def getquestion(form_id,patient_id,question_number):
 			question_number -= 1
 			if question_number == 0:
 				question_number = 1
-			options_list, question, questionNum, template = return_question(question_number)
+			# options_list, question, questionNum, template = return_question(question_number,patient_id,form_id)
 			#print("decrement")
 			#resp.set_cookie('questionID', str(questionID))
 			#return resp
 			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(question_number))
-	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum))
+	resp = make_response(render_template(template, name = "Humzah", question = question[0], options = options_list, questionNum = questionNum, id = patient_id, selected_options = option_texts, selected_texts =fetched_texts  ))
 	return resp
 def writethings(patient_id,question_result,question_number,attemptNumber, form_id):
 	print("Values passed", question_result, question_number)
@@ -134,7 +135,7 @@ def writethings(patient_id,question_result,question_number,attemptNumber, form_i
 			text = question_result[0]
 			print("NEW TEXT",text)
 		print(f"before insert Q:{question_number[0]} Option ID: {option_ids} Text: {text} Option Values:{values} FORM: {form_id} ")
-		returned_bool = check_if_form_question_exists(patient_id,form_id,question_number[0])
+		returned_bool = check_if_form_question_exists(form_id,question_number[0])
 		print("RETURNED BOOL",returned_bool)
 		if returned_bool == True:
 			print("We will need to update")
@@ -193,9 +194,9 @@ def writethings(patient_id,question_result,question_number,attemptNumber, form_i
 
 
 
-def check_if_form_question_exists(patient_id,form_id,question_number):
+def check_if_form_question_exists(form_id,question_number):
 	try:
-		print("INTO TRY OF DEF")
+		print("INTO TRY OF DEF",form_id, question_number)
 		conn = sqlite3.connect(DATABASE)
 		cur = conn.cursor()
 		cur.execute("SELECT EXISTS(SELECT 1 FROM Results WHERE (form_id = ? AND questionID=? ))",(form_id,question_number))
@@ -209,29 +210,144 @@ def check_if_form_question_exists(patient_id,form_id,question_number):
 		conn.close()
 	return bool(fetched_boolean)
 
-def return_question(question_number):
+# def return_question(question_number):
+# 	# global questionID
+# 	#questionID = int(request.cookies.get('questionID'))
+# 	#print("testQ",questionID)
+#
+# 	conn = sqlite3.connect(DATABASE)
+# 	cur = conn.cursor()
+#
+# 	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (question_number,))
+# 	questionNum = cur.fetchone()
+# 	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (question_number,))
+# 	question = cur.fetchone()
+# 	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (question_number,))
+# 	options = cur.fetchall()
+#
+# 	#used to get the template which will
+# 	#print(question,options,questionNum)
+# 	cur.execute("SELECT questionType FROM Questions WHERE questionID =?",(question_number,))
+# 	type = cur.fetchone()[0]
+# 	print("TYPEID",type)
+# 	cur.execute("SELECT questionType FROM QuestionTypes WHERE typeID =?",(type))
+# 	question_type = cur.fetchone()[0]
+# 	cur.close()
+# 	if question_type == "Multiple-Answer":
+# 		#print("MULT")
+# 		template = "Multiple-Answer.html"
+# 	elif question_type == "Single-Answer":
+# 		#print("SINGLE")
+# 		template = "Single-Answer.html"
+# 	elif question_type == "Slider":
+# 		#print("Slider")
+# 		template = "Slider.html"
+# 	elif question_type == "Text-Field":
+# 		#print("TEXT FIELD")
+# 		template = "Text-Field.html"
+# 	else:
+# 		print("There is something wrong",question_type)
+# 	options_list = []
+# 	for option in options:
+# 		options_list.append(option[0])
+# 	print("LIST OF OPTIONS FOR QUESTION",options_list)
+# 	return options_list, question, questionNum, template
+def return_question(question_number,patient_id,form_id):
 	# global questionID
 	#questionID = int(request.cookies.get('questionID'))
 	#print("testQ",questionID)
+	try:
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
 
-	conn = sqlite3.connect(DATABASE)
-	cur = conn.cursor()
+		cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (question_number,))
+		questionNum = cur.fetchone()
+		cur.execute("SELECT question FROM Questions WHERE questionID = ?", (question_number,))
+		question = cur.fetchone()
+		cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (question_number,))
+		options = cur.fetchall()
 
-	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (question_number,))
-	questionNum = cur.fetchone()
-	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (question_number,))
-	question = cur.fetchone()
-	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (question_number,))
-	options = cur.fetchall()
+		#used to get the template which will
+		#print(question,options,questionNum)
+		cur.execute("SELECT questionType FROM Questions WHERE questionID =?",(question_number,))
+		type = cur.fetchone()[0]
+		print("TYPEID",type)
+		cur.execute("SELECT questionType FROM QuestionTypes WHERE typeID =?",(type))
+		question_type = cur.fetchone()[0]
+	except:
+		conn.rollback()
+		print("rolling back")
+	finally:
+		cur.close()
 
-	#used to get the template which will
-	#print(question,options,questionNum)
-	cur.execute("SELECT questionType FROM Questions WHERE questionID =?",(question_number,))
-	type = cur.fetchone()[0]
-	print("TYPEID",type)
-	cur.execute("SELECT questionType FROM QuestionTypes WHERE typeID =?",(type))
-	question_type = cur.fetchone()[0]
-	cur.close()
+	returned_bool = check_if_form_question_exists(form_id,question_number)
+	print("RETURNED BOOL FOR PERSISTENCY",returned_bool)
+	if returned_bool == True:
+		try:
+			conn = sqlite3.connect(DATABASE)
+			cur = conn.cursor()
+			print("The row exists in the results", question_number)
+			cur.execute("SELECT optionID, textField FROM Results WHERE form_id = ? AND questionid = ?;",(form_id,question_number,))
+			fetched_options_texts = cur.fetchall()
+			print("LISTED FETECHELJK",fetched_options_texts )
+			print(list(fetched_options_texts[0]))
+			listed_fetch = list(fetched_options_texts[0])
+			fetched_options = listed_fetch[0]
+			fetched_texts = listed_fetch[1].split(",")
+
+			print("%%%%%%%%%%%%%%%%%%%%%%",fetched_options)
+
+
+			fetched_options = fetched_options.split(",")
+			option_texts =[]
+			for item in fetched_options:
+				print(item)
+				try:
+					cur.execute("SELECT optionText FROM Options WHERE optionID = ?",(int(item),))
+					option_texts.append(cur.fetchone()[0])
+
+				except:
+					conn.rollback()
+					print("ROLLING FROM inside question")
+				finally:
+					pass
+
+
+			print("££££££££££££", fetched_texts)
+
+
+
+
+
+			# for item in listed_fetch:
+			# 	if item == "":
+			# 		print("empty")
+			# 		pass
+			# 	elif item.split(",") > 1:
+			# 		split_options = item.split(",")
+			# 		print(split_options)
+
+
+
+			print("LISTED ggrgr")
+
+		except:
+			conn.rollback()
+			print("ROLLING FROM return question")
+		finally:
+			cur.close()
+		print(option_texts)
+
+
+	else:
+		print("The row doens't exist in the results",question_number)
+		option_texts =[]
+		fetched_texts = []
+
+
+
+
+
 	if question_type == "Multiple-Answer":
 		#print("MULT")
 		template = "Multiple-Answer.html"
@@ -250,7 +366,7 @@ def return_question(question_number):
 	for option in options:
 		options_list.append(option[0])
 	print("LIST OF OPTIONS FOR QUESTION",options_list)
-	return options_list, question, questionNum, template
+	return options_list, question, questionNum, template, option_texts, fetched_texts
 
 def return_from_db(item, question_number):
 	print("Returning values",item, question_number)
@@ -354,7 +470,7 @@ def login():
 			patient_exists = cur.fetchone()
 			session['logged_in'] = True
 			session['username'] = request.form['username']
-			
+
 			print("BEFORE")
 			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
 			print("AFTER")
