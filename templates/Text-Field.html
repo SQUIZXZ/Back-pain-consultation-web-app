@@ -2,7 +2,7 @@
   {%extends 'test.html'%}
   {% block navbar%}
   <center><nav class="nav-bar">
-    <a href ="Home/Patient" > <i class="fa fa-fw fa-user"></i>PROFILE</a>
+    <a href ="/Home/Patient/{{id}}" > <i class="fa fa-fw fa-user"></i>PROFILE</a>
     <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
   </nav></center>
   {% endblock %}
