@@ -3,7 +3,6 @@ from flask import Flask, redirect, request, render_template, make_response, esca
 import sqlite3
 from datetime import datetime
 import time
-from functools import wraps
 
 DATABASE = "BACKonLINE.db"
 conn = sqlite3.connect(DATABASE)
@@ -17,6 +16,8 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 @app.route("/", methods = ["GET","POST"])
 def show_home():
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
 	return redirect(url_for('static', filename='Login.html'))
 # @app.route("/login", methods = ["GET","POST"])
 # def login():
@@ -29,7 +30,11 @@ def show_home():
 @app.route("/getquestion/<int:patient_id>/<int:form_id>/<int:question_number>", methods =["GET", "POST"])
 
 def getquestion(form_id,patient_id,question_number):
-	# global questionID
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+	elif session.get('usertype') != 'Patient':
+		return "ERROR - Permission required"
+
 	print("CURRENT QUETSOPN", question_number)
 	options_list, question, questionNum, template = return_question(question_number)
 	attemptNumber = 1
@@ -318,26 +323,27 @@ def login():
 			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName = ? AND Password=?))",(username,password,))
 			print("AFTER")
 			patient_exists = cur.fetchone()
-			session['logged_in'] = True
-			session['username'] = request.form['username']
-			
 			print("BEFORE")
 			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
 			print("AFTER")
 			clinition_exists = cur.fetchone()
 			print("FETCHED")
-
-			session['logged_in'] = True
-			session['username'] = request.form['username']
 			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
 		except:
 			print("SOMETHING WENT WRONG")
 		if patient_exists[0] == 1:
 			cur.execute("SELECT patientID FROM Patients WHERE (patientName = ? AND Password=?)",(username,password,))
 			id = cur.fetchone()[0]
+			session['username'] = request.form['username']
+			session['logged_in'] = True
+			session['usertype'] = 'Patient'
+			print(session)
 			return redirect("Home/Patient/"+str(id))
 		elif clinition_exists[0] == 1:
-
+			session['username'] = request.form['username']
+			session['logged_in'] = True
+			session['usertype'] = 'Admin'
+			print(session)
 			return redirect("Home/Clinition")
 		else:
 			msg = "The email/password combination is invalid"
@@ -347,7 +353,9 @@ def login():
 @app.route('/logout')
 def logout():
    session.pop('logged_in', None)
-   session.pop('logged_in', None)
+   session.pop('usertype', None)
+   session.pop('username', None)
+   print(session)
    flash("You were logged out")
    return redirect(url_for('login'))
 
@@ -358,11 +366,17 @@ app.secret_key = ' abc123def456ghi789'
 ##### patient route
 @app.route("/Home/Patient/<int:id>", methods = ["GET"])
 def p_home(id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+	elif session.get('usertype') != 'Patient':
+		return "ERROR - Permission required"
 
 	return render_template("Patient.html", id = id)
 
 @app.route("/New-Assessment/<int:patient_id>")
 def new_surver(patient_id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
 	print("USER_ID", patient_id)
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
@@ -400,6 +414,10 @@ def new_surver(patient_id):
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+	elif session.get('usertype') != 'Admin':
+		return "ERROR - Permission required"
 	return render_template("Clinition.html", patients = get_all_patients())
 
 def get_all_patients():
@@ -416,8 +434,13 @@ def get_all_patients():
 	conn.close()
 	return all_patients
 
+
+
+
 @app.route("/View/<int:user_id>")
 def user(user_id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
 	print("HEY")
@@ -442,6 +465,8 @@ def user(user_id):
 
 @app.route("/View/<int:user_id>/<int:form_id>")
 def show_form(user_id,form_id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
 	print("THIS IS BEING USED")
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
@@ -493,26 +518,6 @@ def show_form(user_id,form_id):
 	print(user_id,form_id)
 	return render_template("Submission.html", form_results = results)
 
-@app.route("/submitoption")
-def submitoption():
-	nextquestion = int(request.cookies.get('questionID'))
-	print(nextquestion)
-	conn = sqlite3.connect(DATABASE)
-	cur = conn.cursor()
-	questionID = nextquestion + 1
-	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (questionID,))
-	questionNum = cur.fetchone()
-	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
-	question = cur.fetchone()
-	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
-	options = cur.fetchall()
-	print(questionNum,question,options)
-
-	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options, questionNum = questionNum))
-	resp.set_cookie('questionID', '1')
-
-
-	return resp
 
 	# return "Submission has been sent"  # Needs printing?
 
