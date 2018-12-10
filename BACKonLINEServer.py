@@ -17,6 +17,9 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 @app.route("/", methods = ["GET","POST"])
 def show_home():
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+
 	return redirect(url_for('static', filename='Login.html'))
 # @app.route("/login", methods = ["GET","POST"])
 # def login():
@@ -29,6 +32,11 @@ def show_home():
 @app.route("/getquestion/<int:patient_id>/<int:form_id>/<int:question_number>", methods =["GET", "POST"])
 
 def getquestion(form_id,patient_id,question_number):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+	elif session.get('usertype') != 'Patient':
+		return "ERROR - Permission required"
+
 	# global questionID
 	print("CURRENT QUETSOPN", question_number)
 	options_list, question, questionNum, template, option_texts, fetched_texts = return_question(question_number,patient_id,form_id)
@@ -488,8 +496,18 @@ def login():
 		if patient_exists[0] == 1:
 			cur.execute("SELECT patientID FROM Patients WHERE (patientName = ? AND Password=?)",(username,password,))
 			id = cur.fetchone()[0]
+			session['username'] = request.form['username']
+			session['logged_in'] = True
+			session['usertype'] = 'Patient'
+			print(session)
+
 			return redirect("Home/Patient/"+str(id))
 		elif clinition_exists[0] == 1:
+			session['username'] = request.form['username']
+			session['logged_in'] = True
+			session['usertype'] = 'Admin'
+			print(session)
+
 
 			return redirect("Home/Clinition")
 		else:
@@ -499,8 +517,10 @@ def login():
 
 @app.route('/logout')
 def logout():
-   session.pop('logged_in', None)
-   session.pop('logged_in', None)
+   session.pop('usertype', None)
+   session.pop('username', None)
+   print(session)
+
    flash("You were logged out")
    return redirect(url_for('login'))
 
@@ -511,18 +531,26 @@ app.secret_key = ' abc123def456ghi789'
 ##### patient route
 @app.route("/Home/Patient/<int:id>", methods = ["GET"])
 def p_home(id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+	elif session.get('usertype') != 'Patient':
+		return "ERROR - Permission required"
+
 
 	return render_template("Patient.html", id = id)
 
 @app.route("/New-Assessment/<int:patient_id>")
 def new_surver(patient_id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+
 	print("USER_ID", patient_id)
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
 
 	i = datetime.now()
-	current_date = i.strftime("%Y/%m/%d")
-	stringed_date = current_date.split("/")
+	current_date = i.strftime("%d-%m-%Y")
+	stringed_date = current_date.split("-")
 
 	current_time = i.strftime("%H:%M:%S:%f")
 	stringed_time = current_time.split(":")
@@ -534,7 +562,7 @@ def new_surver(patient_id):
 	conn.commit()
 	conn.close()
 	print("FORM ID", form_id)
-	past_date = datetime(int(stringed_date[0]),int(stringed_date[1]),int(stringed_date[2]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
+	past_date = datetime(int(stringed_date[2]),int(stringed_date[1]),int(stringed_date[0]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
 
 	difference = datetime.utcnow() - past_date
 	if (difference.days == 0):
@@ -553,6 +581,11 @@ def new_surver(patient_id):
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+	elif session.get('usertype') != 'Admin':
+		return "ERROR - Permission required"
+
 	return render_template("Clinition.html", patients = get_all_patients())
 
 def get_all_patients():
@@ -571,6 +604,9 @@ def get_all_patients():
 
 @app.route("/View/<int:user_id>")
 def user(user_id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
 	print("HEY")
@@ -595,6 +631,9 @@ def user(user_id):
 
 @app.route("/View/<int:user_id>/<int:form_id>")
 def show_form(user_id,form_id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
+
 	print("THIS IS BEING USED")
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
