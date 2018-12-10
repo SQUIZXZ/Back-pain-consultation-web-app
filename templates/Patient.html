@@ -8,7 +8,7 @@
 {%block testBlock%}
 Your personal ID: {{id}}<br/><br/>
 <button class = "patient-button" onclick = "location.href='/New-Assessment/{{id}}'">Start New Assessment</button><br/><br/>
-<button class = "patient-button" onclick = "edit_submissions()">Edit Submissions</button>
+<button class = "patient-button" onclick = "location.href='/Home/Patient/{{id}}/Edit_Submissions'">Edit Submissions</button>
 
 <script>
   function edit_submissions(){

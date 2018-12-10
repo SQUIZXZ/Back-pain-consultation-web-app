@@ -538,7 +538,31 @@ def p_home(id):
 
 
 	return render_template("Patient.html", id = id)
+@app.route("/Home/Patient/<int:user_id>/Edit_Submissions")
+def edit_submission(user_id):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+		return redirect(url_for('login'))
 
+	conn = sqlite3.connect(DATABASE)
+	cur = conn.cursor()
+	print("HEY")
+	print(user_id)
+	# Gets the date/time time the form was submitted with the id for the specific patient
+	cur.execute("SELECT FormSubmissions.dateCreated, FormSubmissions.id FROM FormSubmissions WHERE patientID = ?",(user_id,))
+	date_time = cur.fetchone()
+	# Gets all of the results for that one submisson (put in differnt app route)
+	cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+	INNER JOIN Questions ON Questions.questionID = Results.questionID
+	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+	WHERE FormSubmissions.completed = "False" AND Results.patientID = ?;""",(user_id,))
+	# Gets the date created and completed forms from a specific patient
+	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = ? AND completed = 'False'", (user_id,))
+	submissions_by_patient = cur.fetchall()
+	print(submissions_by_patient)
+	print(f"Date is {date_time[0]} and time was {date_time[1]}")
+
+	return render_template("Edit_Submissions.html", submissions = submissions_by_patient, user_id = user_id)
 @app.route("/New-Assessment/<int:patient_id>")
 def new_surver(patient_id):
 	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
@@ -591,7 +615,10 @@ def c_home():
 def get_all_patients():
 	conn = sqlite3.connect(DATABASE)
 	cur = conn.cursor()
-	cur.execute("SELECT patients.patientID,patients.patientName FROM FormSubmissions INNER JOIN patients ON patients.patientID = FormSubmissions.patientID WHERE FormSubmissions.completed = 'True'")
+	cur.execute("""SELECT patients.patientID,patients.patientName
+	FROM FormSubmissions
+	INNER JOIN patients ON patients.patientID = FormSubmissions.patientID
+	WHERE FormSubmissions.completed = 'True'""")
 	all_patients = cur.fetchall()
 
 	print("PATIENDS",all_patients)
