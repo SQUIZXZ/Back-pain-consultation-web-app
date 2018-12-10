@@ -97,7 +97,7 @@
   color: #EF3B3A;
 }
 body {
-  background-color: #EBEBEB;
+  background-color: #DEE2E5;
 }
 
 .patients-list {
@@ -245,7 +245,7 @@ h1{
   font-family: 'Montserrat', sans-serif;
 }
 
-<<<<<<< HEAD
+
 .patient-button {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
@@ -259,7 +259,8 @@ h1{
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
-=======
+}
+
 .slideroptions {
   float: left;
   padding: 0 1em;
@@ -274,5 +275,5 @@ h1{
 
 #slider{
   display: inline-block;
->>>>>>> acd5b6b14bd9184ee64eec75632f2083b8daf169
+
 }
