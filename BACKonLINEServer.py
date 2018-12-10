@@ -336,7 +336,10 @@ def return_question(question_number,patient_id,form_id):
 			print("ROLLING FROM return question")
 		finally:
 			cur.close()
-		print(option_texts)
+		print(option_texts, fetched_texts)
+		fetched_texts = ':'.join(fetched_texts)
+		option_texts = ':'.join(option_texts)
+		print("£$%£$%^&%&&^%&%", fetched_texts, option_texts)
 
 
 	else:

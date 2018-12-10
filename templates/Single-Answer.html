@@ -35,31 +35,45 @@
 
   </form>
   <script>
-    var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
-    if (selected_boxes ==="[]"){}else{
-    selected_boxes = " "+selected_boxes;
-    var selected_boxes = selected_boxes.slice(1,-1);
-    var varray = selected_boxes.split(",");
-    // alert(what)
-    // alert(varray);
-    len =varray.length;
-    alert("0")
-    for (var i = 0; i<len; i++){
-      alert("1")
+  //   var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
+  //   if (selected_boxes ==="[]"){}else{
+  //   selected_boxes = " "+selected_boxes;
+  //   var selected_boxes = selected_boxes.slice(1,-1);
+  //   var varray = selected_boxes.split(",");
+  //   // alert(what)
+  //   // alert(varray);
+  //   len =varray.length;
+  //   alert("0")
+  //   for (var i = 0; i<len; i++){
+  //     alert("1")
+  //
+  //     // alert(varray[i]);
+  //     var item = varray[i].slice(2,-1);
+  //     alert("2")
+  //     // alert(item);
+  //     // alert(item === "Codeine");
+  //     // alert(item.toString());
+  //     alert(item.toString())
+  //     var checkbox_select = document.getElementById(item.toString());
+  //     alert("3")
+  //     checkbox_select.checked = true;
+  //     alert("4")
+  //   }
+  // }
+  var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
+  // alert(selected_boxes)
+  if (selected_boxes ==="[]"){}else{
+  var varray = selected_boxes.split(":");
+  len =varray.length;
+  for (var i = 0; i<len; i++){
 
-      // alert(varray[i]);
-      var item = varray[i].slice(2,-1);
-      alert("2")
-      // alert(item);
-      // alert(item === "Codeine");
-      // alert(item.toString());
-      alert(item.toString())
-      var checkbox_select = document.getElementById(item.toString());
-      alert("3")
-      checkbox_select.checked = true;
-      alert("4")
-    }
+    // alert(varray[i]);
+    var item = varray[i];
+    // alert(item === "Codeine");
+    var checkbox_select = document.getElementById(item.toString());
+    checkbox_select.checked = true;
   }
+}
   </script>
   <!-- <a href = "/"> Next </a> -->
   {%endblock%}

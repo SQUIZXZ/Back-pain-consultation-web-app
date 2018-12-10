@@ -35,20 +35,15 @@
   </form>
   <script>
     var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
+    // alert(selected_boxes)
     if (selected_boxes ==="[]"){}else{
-    selected_boxes = " "+selected_boxes;
-    var selected_boxes = selected_boxes.slice(1,-1);
-    var varray = selected_boxes.split(",");
-    // alert(what)
-    // alert(varray);
+    var varray = selected_boxes.split(":");
     len =varray.length;
     for (var i = 0; i<len; i++){
 
       // alert(varray[i]);
-      var item = varray[i].slice(2,-1);
-      // alert(item);
+      var item = varray[i];
       // alert(item === "Codeine");
-      // alert(item.toString());
       var checkbox_select = document.getElementById(item.toString());
       checkbox_select.checked = true;
     }
@@ -65,7 +60,7 @@
     // this will store what the button was pressed.
     var clicked;
     function valquestion(){
-      alert(clicked);
+      // alert(clicked);
       var default1 = false;
 
       if (clicked == "Next") {
@@ -80,10 +75,10 @@
       }
 
       if (default1 == false) {
-        alert("UH OH")
+        // alert("UH OH")
       //  return false;
     } else{
-      alert("accepted")
+      // alert("accepted")
     }
       return default1;
     }else{
