@@ -21,12 +21,13 @@
   <meta content = "{{selected_options}}" property = 'options_text'>
   <form action="" method = "POST" name="question-options">
   <div id = "slider">
-
-  <label class="slideroptions" >0<br />
-    <input type="radio" id="option0" name="option" value="0" />
+  {%for value in options%}
+  <label class="slideroptions" >{{value}}<br />
+    <input type="radio" id="{{value}}" name="option" value="{{value}}" />
   </label>
+  {%endfor%}
 
-  <label class="slideroptions" >1<br />
+  <!-- <label class="slideroptions" >1<br />
     <input type="radio" id="option1" name="option" value="1" />
   </label>
 
@@ -65,14 +66,42 @@
 
   <label class="slideroptions" >10<br />
     <input type="radio" id="option10" name="option" value="10" />
-  </label>
+  </label> -->
   </div>
   <br><br>
     <input class="question-button" type="submit" name="Back" value="Back" formnovalidate>
     <input class="question-button" type="submit" name="Next" value="Next">
   </form>
   <!-- <a href = "/"> Next </a> -->
+  <script>
+    // console.log("HELLO")
+    var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
+    // alert("1")
+    // alert(selected_boxes)
+    if (selected_boxes ==="[]"){alert("YES")}else{
+    var varray = selected_boxes.split(":");
+    // alert(varray);
+    len =varray.length;
+    for (var i = 0; i<len; i++){
+      var item = varray[i];
+      var checkbox_select = document.getElementById(item.toString());
+      checkbox_select.checked = true;
+  }
+
+  }
+  //   len =varray.length;
+  //   for (var i = 0; i<len; i++){
+  //
+  //     // alert(varray[i]);
+  //     var item = varray[i];
+  //     // alert(item === "Codeine");
+  //     var checkbox_select = document.getElementById(item.toString());
+  //     checkbox_select.checked = true;
+  //   }
+  // }
+  </script>
   {%endblock%}
+
 
   <!-- <table class="table">
 
