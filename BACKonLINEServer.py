@@ -37,11 +37,11 @@ def getquestion(form_id,patient_id,question_number):
 	# resp.set_cookie('questionID', '1')
 	if request.method == "POST":
 		if "Next" in request.form:
-			hey = request.args.get("question-options")
-			#print(hey)
-			test1 = request.form["option"]
-			#print("TES",test1)
-			hey1 = request.args.get("option")
+			# hey = request.args.get("question-options")
+			# #print(hey)
+			# test1 = request.form["option"]
+			# #print("TES",test1)
+			# hey1 = request.args.get("option")
 			#print("es",hey1)
 			question_result = request.form.getlist("option")
 
@@ -55,6 +55,8 @@ def getquestion(form_id,patient_id,question_number):
 			writethings(patient_id, question_result,questionNum,attemptNumber, form_id)
 			# questionID = questionID + 1
 			question_number += 1
+			if question_number > 39:
+				question_number = 39
 			options_list, question, questionNum, template = return_question(question_number)
 			#print("increment")
 			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(question_number))
@@ -131,19 +133,36 @@ def writethings(patient_id,question_result,question_number,attemptNumber, form_i
 			text = question_result[0]
 			print("NEW TEXT",text)
 		print(f"before insert Q:{question_number[0]} Option ID: {option_ids} Text: {text} Option Values:{values} FORM: {form_id} ")
-		cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','form_id') VALUES (?,?,?,?,?,?)",(patient_id,question_number[0],option_ids,values,text,form_id))
-		print('into the try333')
-		conn.commit()
-		conn.close()
-		print('into the try444')
-		msg = "record saved successfully"
+		returned_bool = check_if_form_question_exists(patient_id,form_id,question_number[0])
+		print("RETURNED BOOL",returned_bool)
+		if returned_bool == True:
+			print("We will need to update")
+			print(option_ids,text,values,form_id,question_number[0],patient_id)
+			try:
+
+				cur.execute("UPDATE Results SET optionID = ? , textField = ?, optionValue = ? WHERE form_id =? AND questionID = ? AND patientID = ? ",(option_ids,text,values,form_id,question_number[0],patient_id,))
+				conn.commit()
+				print("Worked")
+			except:
+				print("Not working")
+			msg = "IPDATE NEEDED"
+		else:
+			print("We will need to insert a new row")
+			cur.execute("INSERT INTO Results ('patientID', 'questionID', 'optionID', 'optionValue', 'textField','form_id') VALUES (?,?,?,?,?,?)",(patient_id,question_number[0],option_ids,values,text,form_id,))
+			print('into the try333')
+			conn.commit()
+
+			print('into the try444')
+			msg = "record saved successfully"
 	except:
 		#conn.rollback()
 		print('rollback')
 		msg = "An error has occured"
 	finally:
+		conn.close()
 
 		print('finllay')
+		print(msg)
 		return msg
 	# print("Writing data into database")
 	# #print('tititititi')
@@ -173,7 +192,21 @@ def writethings(patient_id,question_result,question_number,attemptNumber, form_i
 
 
 
+def check_if_form_question_exists(patient_id,form_id,question_number):
+	try:
+		print("INTO TRY OF DEF")
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT EXISTS(SELECT 1 FROM Results WHERE (form_id = ? AND questionID=? ))",(form_id,question_number))
+		fetched_boolean = cur.fetchone()[0]
+		print("Boolean:",bool(fetched_boolean))
+	except:
+		conn.rollback()
+		print('ROOUJLKKJ')
+	finally:
 
+		conn.close()
+	return bool(fetched_boolean)
 
 def return_question(question_number):
 	# global questionID
@@ -190,6 +223,7 @@ def return_question(question_number):
 	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (question_number,))
 	options = cur.fetchall()
 
+	#used to get the template which will
 	#print(question,options,questionNum)
 	cur.execute("SELECT questionType FROM Questions WHERE questionID =?",(question_number,))
 	type = cur.fetchone()[0]
@@ -377,7 +411,7 @@ def new_surver(patient_id):
 	conn.close()
 	print("FORM ID", form_id)
 	past_date = datetime(int(stringed_date[0]),int(stringed_date[1]),int(stringed_date[2]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
-	
+
 	difference = datetime.utcnow() - past_date
 	if (difference.days == 0):
 		msg = "Date is within 24 hours"
