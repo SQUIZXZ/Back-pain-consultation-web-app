@@ -1,10 +1,17 @@
   {%extends 'test.html'%}
+  {% block navbar%}
+  <center><nav class="nav-bar">
+    <a href = > <i class="fa fa-fw fa-user"></i>PROFILE</a>
+    <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
+  </nav></center>
+  {% endblock %}
 {%block testBlock%}
 
 {%for question in form_results%}
 <article class="question-box">
   <h2>Question {{question[2]}}:</h2>
   <p>{{question[1]}}</p>
+  <br/>
 <form>
 {%if question[0] == "Single-Answer"%}
 

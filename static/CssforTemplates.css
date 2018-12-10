@@ -1,6 +1,12 @@
 *{
   padding: 0px;
   margin: 0px;
+  -webkit-animation: fadein 0.9s;
+}
+
+@keyframes fadein {
+   from { opacity: 0; }
+   to   { opacity: 1; }
 }
 
 .login-page {
@@ -94,19 +100,12 @@ body {
   background-color: #EBEBEB;
 }
 
-a {
--webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box;
-padding-right:3px;
-margin:0px;
-margin-top: 10px;
-width:100px;
-background-color: white;
+.patients-list {
+  text-align: center;
+}
+
+.patients-list a {
 text-decoration: none;
-text-align:center;
-display:inline-block;
-width:100px;
 color:black;
 }
 
@@ -165,6 +164,7 @@ h1{
   font-size: 40px;
   width:600px;
   max-width: 100%;
+  text-decoration: none;
 }
 
 .question-button {
@@ -245,6 +245,21 @@ h1{
   font-family: 'Montserrat', sans-serif;
 }
 
+<<<<<<< HEAD
+.patient-button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #4CAF50;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+=======
 .slideroptions {
   float: left;
   padding: 0 1em;
@@ -259,4 +274,5 @@ h1{
 
 #slider{
   display: inline-block;
+>>>>>>> acd5b6b14bd9184ee64eec75632f2083b8daf169
 }

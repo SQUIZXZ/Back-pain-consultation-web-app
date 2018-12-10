@@ -1,10 +1,16 @@
   {%extends 'test.html'%}
+  {% block navbar%}
+  <center><nav class="nav-bar">
+    <a href = > <i class="fa fa-fw fa-user"></i>PROFILE</a>
+    <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
+  </nav></center>
+  {% endblock %}
 {%block testBlock%}
-hey
+<h3>User's submissions</h3><br/>
 <ul>
   {%for submission in submissions%}
 
-  <li><a href = "/View/{{user_id}}/{{submission[1]}}">{{submission[0]}}</a></li>
+  <a href = "/View/{{user_id}}/{{submission[1]}}">{{submission[0]}}</a><br/>
   {%endfor%}
 </ul>
 {%endblock%}
