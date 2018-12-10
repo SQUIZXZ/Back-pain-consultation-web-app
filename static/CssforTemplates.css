@@ -244,3 +244,19 @@ h1{
 .form-title {
   font-family: 'Montserrat', sans-serif;
 }
+
+.slideroptions {
+  float: left;
+  padding: 0 1em;
+  text-align: center;
+  font-size: 15;
+}
+
+.slideroptions input{
+  width: 20px;
+  height: 20px;
+}
+
+#slider{
+  display: inline-block;
+}

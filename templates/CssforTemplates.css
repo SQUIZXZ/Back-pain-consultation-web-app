@@ -148,3 +148,8 @@ h1{
 #main{
   text-align: center;
 }
+
+#slider{
+  display: inline-block;
+
+}
