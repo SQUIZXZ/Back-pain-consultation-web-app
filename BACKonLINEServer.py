@@ -17,7 +17,7 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 @app.route("/", methods = ["GET","POST"])
 def show_home():
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 
 	return redirect("Login")
@@ -25,14 +25,14 @@ def show_home():
 # def login():
 # 	if request.method == "POST":
 # 		print("acualy working")
-# 		username = request.form["username"]
+# 		email = request.form["email"]
 # 		password = request.form["password"]
 
 
 @app.route("/getquestion/<int:patient_id>/<int:form_id>/<int:question_number>", methods =["GET", "POST"])
 
 def getquestion(form_id,patient_id,question_number):
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 	elif session.get('usertype') != 'Patient':
 		return "ERROR - Permission required"
@@ -561,43 +561,43 @@ def patientAddDetails():
 def login():
 
 	if request.method=='POST':
-		username = request.form.get('username', default = "Error")
+		email = request.form.get('email', default = "Error")
 		password = request.form.get('password', default = "Error")
-		print(username,password)
+		print(email,password)
 		try:
 			conn = sqlite3.connect(DATABASE)
 			cur = conn.cursor()
 			print("BEFORE")
-			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName = ? AND Password=?))",(username,password,))
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (Email = ? AND Password=?))",(email,password,))
 			print("AFTER")
 			patient_exists = cur.fetchone()
 			session['logged_in'] = True
-			session['username'] = request.form['username']
+			session['email'] = request.form['email']
 
 			print("BEFORE")
-			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (clinitionName = ? AND Password=?))",(username,password,))
+			cur.execute("SELECT EXISTS(SELECT 1 FROM Clinitions WHERE (Email = ? AND Password=?))",(email,password,))
 			print("AFTER")
 			clinition_exists = cur.fetchone()
 			print("FETCHED")
 
 			session['logged_in'] = True
-			session['username'] = request.form['username']
-			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
+			session['email'] = request.form['email']
+			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(email,password,))
 		except:
 			print("SOMETHING WENT WRONG")
 			conn.rollback()
 
 		if patient_exists[0] == 1:
-			cur.execute("SELECT patientID FROM Patients WHERE (patientName = ? AND Password=?)",(username,password,))
+			cur.execute("SELECT patientID FROM Patients WHERE (Email = ? AND Password=?)",(email,password,))
 			id = cur.fetchone()[0]
-			session['username'] = request.form['username']
+			session['email'] = request.form['email']
 			session['logged_in'] = True
 			session['usertype'] = 'Patient'
 			print(session)
 
 			return redirect("Home/Patient/"+str(id))
 		elif clinition_exists[0] == 1:
-			session['username'] = request.form['username']
+			session['email'] = request.form['email']
 			session['logged_in'] = True
 			session['usertype'] = 'Admin'
 
@@ -608,14 +608,14 @@ def login():
 			return redirect("Home/Clinition")
 		else:
 
-			flash('The username/password combination is invalid')
+			flash('The email/password combination is invalid')
 
 	return render_template('Login.html')
 
 @app.route('/logout')
 def logout():
    session.pop('usertype', None)
-   session.pop('username', None)
+   session.pop('email', None)
    print(session)
 
    flash("You were logged out")
@@ -628,7 +628,7 @@ app.secret_key = ' abc123def456ghi789'
 ##### patient route
 @app.route("/Home/Patient/<int:id>", methods = ["GET"])
 def p_home(id):
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 	elif session.get('usertype') != 'Patient':
 		return "ERROR - Permission required"
@@ -714,7 +714,7 @@ def delete_form_from_db(id):
 
 @app.route("/Home/Patient/<int:user_id>/Edit_Submissions")
 def edit_submissions(user_id):
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 	try:
 		conn = sqlite3.connect(DATABASE)
@@ -766,7 +766,7 @@ def edit_form(patient_id,form_id):
 
 @app.route("/New-Assessment/<int:patient_id>")
 def new_surver(patient_id):
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 
 	print("USER_ID", patient_id)
@@ -806,7 +806,7 @@ def new_surver(patient_id):
 #### cliniton route
 @app.route("/Home/Clinition", methods = ["GET","POST"])
 def c_home():
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 	elif session.get('usertype') != 'Admin':
 		return "ERROR - Permission required"
@@ -832,7 +832,7 @@ def get_all_patients():
 
 @app.route("/View/<int:user_id>")
 def user(user_id):
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 
 	conn = sqlite3.connect(DATABASE)
@@ -862,7 +862,7 @@ def user(user_id):
 
 @app.route("/View/<int:user_id>/<int:form_id>")
 def show_form(user_id,form_id):
-	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
+	if not session.get('logged_in') and not session.get('usertype') and not session.get('email'):
 		return redirect(url_for('login'))
 
 	print("THIS IS BEING USED")
