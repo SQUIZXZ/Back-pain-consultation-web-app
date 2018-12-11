@@ -18,21 +18,23 @@
 <label class="radios">
 <input type="radio" name="option"  checked = "checked" disabled  >
 {{question[3]}}
+<span class="checkmark"></span>
 </label>
 
 
 
 {%elif question[0] == "Multiple-Answer"%}
 {%for option in question[3]%}
-<label class="checkbox">
+<label class="radios">
   <input class="box" type="checkbox" name="option" checked = "checked"  disabled  >
   {{option}}
+  <span class="checkmark"></span>
 </label>
 {%endfor%}
 
 {%elif question[0] == "Text-Field"%}
-<label class="text-field">
-  <input type="text" name="option" value="{{question[4]}}" readonly >
+<label class="text-fields">
+  <input type="text" size="90" class="text-field" name="option" value="{{question[4]}}" readonly >
 </label>
 
 {%elif question[0] == "Slider"%}

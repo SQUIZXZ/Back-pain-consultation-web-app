@@ -15,13 +15,13 @@
       <input type="text" placeholder="Name" name = "patientName" required/>
       <input type="password" placeholder="Password" name = "Password" required/>
       <input type="email" placeholder="Email" name = "Email" required/>
-      <label class="labels"> Gender: </label>
+
       <select name = "Gender" required>
          <option value="Male">Male</option>
          <option value="Female">Female</option>
          <option value="Other">Other</option>
          <option value="Prefer Not to Say">Prefer Not to Say</option>
-      </select><br/><br/>
+      </select>
       <input placeholder="Age" type = "number" name = "Age" required/>
       <button>Create</button>
       <p class="message">Already registered? <a href="/Login">LOGIN</a></p>
@@ -44,28 +44,28 @@
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/Patient/AddPatient', true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    alert("THIS IS WORKING HERE")
+    // alert("THIS IS WORKING HERE")
 
     xhttp.onload = function() {
-      alert(xhttp.readyState);
-      alert(xhttp.status);
+      // alert(xhttp.readyState);
+      // alert(xhttp.status);
       if ((xhttp.readyState === 4) && (xhttp.status === 200)) {
 
-        alert("WE ARE INSIDE");
+        // alert("WE ARE INSIDE");
         console.log(xhttp.responseText);
         response_text = xhttp.responseText.trim();
-        alert(response_text);
+        // alert(response_text);
         if (response_text === "SUCCESS"){
           // Change the route to wherever the user will be redirected to
           window.location.href = "/Login";
 
         }else if(response_text === "EXISTS"){
           // Response text for if the user already exists in the database
-          alert("The patient already exists, please check email for their login details");
+          // alert("The patient already exists, please check email for their login details");
         document.getElementByID("txt").innerHTML = xhttp.responseText;
         }else {
           // Response text for if the server gets an error while going into the DB
-        alert(response_text)
+        // alert(response_text)
         console.error(xhttp.statusText);
         }
       }

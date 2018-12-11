@@ -1,0 +1,26 @@
+{%extends 'test.html'%}
+{% block navbar%}
+<center><nav class="nav-bar">
+  <a href = "/Home/Patient/{{patient_id}}"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
+  <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
+</nav></center>
+{% endblock %}
+{%block testBlock%}
+
+<div class = "information">
+  <h2>Submitting Assessment</h2>
+  <br>
+  <form class ="submit" method = "POST">
+  <p> Click on SUBMIT if you want to submit the assessment to the Clinician or Click BACK to go back to the last question.</p><br>
+  <p> NOTE: Submitting the assessment will mean that you will no longer be able to change your options.</p><br>
+
+  
+  <input class="question-button" type="submit" name="Back" value="Back" onclick="clicked='Back'" formnovalidate>
+  <input class="question-button" type="submit" value="Submit " name="Submit" onclick="clicked='Next'">
+  </form>
+</div>
+
+
+
+
+{%endblock%}

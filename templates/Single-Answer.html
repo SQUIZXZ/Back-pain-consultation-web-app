@@ -2,23 +2,20 @@
   {%extends 'test.html'%}
   {% block navbar%}
   <center><nav class="nav-bar">
-    <a href = "/Home/Patient/{{id}}" > <i class="fa fa-fw fa-user"></i>PROFILE</a>
+    <a onclick="window.location='/Home/Patient/{{id}}';"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
     <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
   </nav></center>
   {% endblock %}
   {%block testBlock%}
-  <!-- <p> This is Template {{ name }} </p> -->
   <p> Question {{ questionNum[0] }}: </p>
   <p>  {{ question }}</p>
-  <!-- <p>Options {{options}}</p>
-  <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
   <meta content = "{{selected_options}}" property = 'options_text'>
   <form action="" method = "POST" name="question-options">
     <table class="table">
       <br/>
       {%for value in options%}
       <tr>
-        <td><br/>
+        <td class="radio-content"><br/>
           <label class="radios">
             <input id ="{{value}}" type="radio" name="option" value="{{value}}" required = True>
             {{value}}
@@ -35,31 +32,7 @@
 
   </form>
   <script>
-  //   var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
-  //   if (selected_boxes ==="[]"){}else{
-  //   selected_boxes = " "+selected_boxes;
-  //   var selected_boxes = selected_boxes.slice(1,-1);
-  //   var varray = selected_boxes.split(",");
-  //   // alert(what)
-  //   // alert(varray);
-  //   len =varray.length;
-  //   alert("0")
-  //   for (var i = 0; i<len; i++){
-  //     alert("1")
-  //
-  //     // alert(varray[i]);
-  //     var item = varray[i].slice(2,-1);
-  //     alert("2")
-  //     // alert(item);
-  //     // alert(item === "Codeine");
-  //     // alert(item.toString());
-  //     alert(item.toString())
-  //     var checkbox_select = document.getElementById(item.toString());
-  //     alert("3")
-  //     checkbox_select.checked = true;
-  //     alert("4")
-  //   }
-  // }
+
   var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
   // alert(selected_boxes)
   if (selected_boxes ==="[]"){}else{
@@ -75,5 +48,4 @@
   }
 }
   </script>
-  <!-- <a href = "/"> Next </a> -->
   {%endblock%}

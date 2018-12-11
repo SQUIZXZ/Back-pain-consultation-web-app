@@ -2,16 +2,13 @@
   {%extends 'test.html'%}
   {% block navbar%}
   <center><nav class="nav-bar">
-    <a href ="Home/Patient/{{id}}" > <i class="fa fa-fw fa-user"></i>PROFILE</a>
+    <a onclick="window.location='/Home/Patient/{{id}}';"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
     <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
   </nav></center>
   {% endblock %}
   {%block testBlock%}
-  <!-- <p> This is Template {{ name }} </p> -->
   <p> Question {{ questionNum[0] }}: </p>
   <p>  {{ question }}</p>
-  <!-- <p>Options {{options}}</p> -->
-  <!-- <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
   <meta content = "{{selected_options}}" property = 'options_text'>
   <form action="" onsubmit="return valquestion()" method = "POST" name="question-options" id = "q_form">
     <table class="table">
@@ -92,15 +89,6 @@
     "Everything I do causes me pain",
     "Nothing I do stops my pain",
     "Nothing helped"];
-    // alert(condition_array.includes(String(last_item.value)))
-    // alert(typeof last_item.value)
-    // alert(typeof condition_array[0])
-
-   //function val() {
-    // if(options_stuff.checked == false) {
-      // alert('You must select an option')
-    // }
-  // }
 
     last_item.addEventListener('click',function(){
       if (last_item.checked == true && condition_array.includes(String(last_item.value))){
@@ -125,17 +113,7 @@
       // alert("top stuff checkd")
       last_item.checked = false;
     }
-//     $(form).submit(function(e) {
-//     e.preventDefault();
-//     for (var i=0; i<list_length; i++){
-//       if (options_stuff[i].checked == true) {
-//         alert("Atleast one is correct");
-//         return true;
-//       }
-//
-//     }
-//     return false;
-// }
+
   </script>
   <!-- <a href = "/"> Next </a> -->
   {%endblock%}

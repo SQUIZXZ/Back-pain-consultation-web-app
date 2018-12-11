@@ -1,5 +1,4 @@
 {%extends 'test.html'%}
-THIS IS A REDIRECT BLANK PAGE
 {% block logouttext %}
 
 {% endblock %}
@@ -10,10 +9,16 @@ THIS IS A REDIRECT BLANK PAGE
 </nav></center>
 {% endblock %}
 {%block testBlock%}
-<h2>Patients:</h2>
+<h2>Submitted Patients:</h2>
+{%if not patients%}
+
+  <p id = "message">You currently do not have any patients that have submitted a survey.</p>
+
+{%else%}
 <ul class="patients-list">
 {%for patient in patients%}
 <a href="/View/{{patient[0]}}">{{patient[1]}}</a><br/>
 {%endfor%}
 <ul>
+{%endif%}
   {% endblock %}
