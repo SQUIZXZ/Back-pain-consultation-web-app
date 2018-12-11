@@ -20,7 +20,7 @@ def show_home():
 	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
 		return redirect(url_for('login'))
 
-	return redirect(url_for('static', filename='Login.html'))
+	return redirect("Login")
 # @app.route("/login", methods = ["GET","POST"])
 # def login():
 # 	if request.method == "POST":
@@ -422,8 +422,10 @@ def submit(patient_id,form_id):
 				conn = sqlite3.connect(DATABASE)
 				cur = conn.cursor()
 				print("1")
+				scores = calculate_scores(form_id)
+
 				# cur.execute("UPDATE FormSubmissions SET completed = ? , dateSubmitted = ? WHERE id = ?",("True",stringed_date_time,int(form_id),))
-				cur.execute("UPDATE FormSubmissions SET completed = ? , dateSubmitted = ? WHERE id = ?",("True",stringed_date_time,form_id,))
+				cur.execute("UPDATE FormSubmissions SET completed = ? , dateSubmitted = ?, totalScores = ? WHERE id = ?",("True",stringed_date_time,scores,form_id,))
 				print("2")
 				conn.commit()
 				print("3")
@@ -447,7 +449,7 @@ def submit(patient_id,form_id):
 				msg = "Retrieved"
 			except:
 				conn.rollback()
-				print("rollback")
+				print("rollbacksdw")
 				msg = "error"
 			finally:
 				conn.close()
@@ -455,8 +457,39 @@ def submit(patient_id,form_id):
 		if "Back" in request.form:
 			print("WIll go back")
 			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(39))
+def calculate_scores(form_id):
+	try:
+		total_score = 0
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		cur.execute("SELECT SUM(Questions.maxScores) FROM Questions INNER JOIN Results ON Results.questionID = Questions.questionID WHERE Results.form_id = ?",(int(form_id),))
+		max_score = cur.fetchone()[0]
+		cur.execute("SELECT optionValue FROM Results WHERE form_id = ?;",(int(form_id),))
+		patient_scores = cur.fetchall()
+		patient_scores = map(list, patient_scores)
+		for score in patient_scores:
+			if len(score[0]) == 1:
+				total_score += int(score[0])
+			else:
+				scores = score[0].split(",")
+				for i in scores:
+					total_score += int(i)
+
+			# score = score.split(",")
 
 
+
+
+
+	except:
+		conn.rollback()
+		print("rollback")
+		msg = "error"
+	finally:
+		conn.close()
+	returning_value = str(total_score) +"/" +str(max_score)
+	print("WOAH",returning_value)
+	return returning_value
 # Hard codeed - testing if server is successfully processes data into the DB
 # @app.route("/getquestion")
 # def testing_data():
@@ -526,6 +559,7 @@ def patientAddDetails():
 
 @app.route("/Login", methods = ['GET', 'POST'])
 def login():
+
 	if request.method=='POST':
 		username = request.form.get('username', default = "Error")
 		password = request.form.get('password', default = "Error")
@@ -551,6 +585,8 @@ def login():
 			# cur.execute("SELECT EXISTS(SELECT 1 FROM Patients WHERE (patientName =? AND Email=?))",(username,password,))
 		except:
 			print("SOMETHING WENT WRONG")
+			conn.rollback()
+
 		if patient_exists[0] == 1:
 			cur.execute("SELECT patientID FROM Patients WHERE (patientName = ? AND Password=?)",(username,password,))
 			id = cur.fetchone()[0]
@@ -564,14 +600,17 @@ def login():
 			session['username'] = request.form['username']
 			session['logged_in'] = True
 			session['usertype'] = 'Admin'
+
 			print(session)
+
 
 
 			return redirect("Home/Clinition")
 		else:
-			msg = "The email/password combination is invalid"
 
-	return render_template('Login.html', msg='')
+			flash('The username/password combination is invalid')
+
+	return render_template('Login.html')
 
 @app.route('/logout')
 def logout():
@@ -742,7 +781,7 @@ def new_surver(patient_id):
 	stringed_time = current_time.split(":")
 
 	stringed_date_time = current_date + "," + current_time
-	cur.execute("INSERT INTO FormSubmissions (patientID, completed, dateCreated,dateSubmitted) VALUES (?,?,?,?)",(patient_id,'False',stringed_date_time," ",))
+	cur.execute("INSERT INTO FormSubmissions (patientID, completed, dateCreated,dateSubmitted,totalScores) VALUES (?,?,?,?,?)",(patient_id,'False',stringed_date_time," "," ",))
 	print("DATE-TIME", current_date + "," + current_time,stringed_date_time)
 	form_id = cur.lastrowid
 	conn.commit()
@@ -812,9 +851,10 @@ def user(user_id):
 	# Gets the date created and completed forms from a specific patient
 	cur.execute("SELECT patientName FROM Patients WHERE patientID = ?", (user_id,))
 	name = cur.fetchone()[0]
-	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = ? AND completed = 'True'", (user_id,))
+	cur.execute("SELECT dateCreated, id, totalScores FROM FormSubmissions WHERE patientID = ? AND completed = 'True'", (user_id,))
 	submissions_by_patient = cur.fetchall()
 	print(submissions_by_patient)
+
 	print(f"Date is {date_time[0]} and time was {date_time[1]}")
 
 	return render_template("Patient-Submissions.html", submissions = submissions_by_patient, user_id = user_id, Name =name)
