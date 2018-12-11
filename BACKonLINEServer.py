@@ -67,6 +67,7 @@ def getquestion(form_id,patient_id,question_number):
 			question_number += 1
 			if question_number > 39:
 				question_number = 39
+				return redirect("submit_assessment/"+str(patient_id)+"/"+str(form_id))
 			# options_list, question, questionNum, template = return_question(question_number,patient_id,form_id)
 			#print("increment")
 			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(question_number))
@@ -399,6 +400,63 @@ def return_from_db(item, question_number):
 	cur.close()
 	return fetched_value, fetched_id
 
+
+@app.route("/submit_assessment/<int:patient_id>/<int:form_id>", methods = ["GET","POST"])
+def submit(patient_id,form_id):
+	if request.method == "GET":
+		print("SUBMITTING", patient_id, form_id)
+		return render_template("Submit.html", patient_id = patient_id, form_id =form_id )
+	if request.method == "POST":
+		print("POSTING")
+		if "Submit" in request.form:
+			i = datetime.now()
+			current_date = i.strftime("%d-%m-%Y")
+			stringed_date = current_date.split("-")
+			print(stringed_date)
+			current_time = i.strftime("%H:%M:%S:%f")
+			stringed_time = current_time.split(":")
+			print(stringed_time)
+			stringed_date_time = current_date + "," + current_time
+			print(stringed_date_time)
+			try:
+				conn = sqlite3.connect(DATABASE)
+				cur = conn.cursor()
+				print("1")
+				# cur.execute("UPDATE FormSubmissions SET completed = ? , dateSubmitted = ? WHERE id = ?",("True",stringed_date_time,int(form_id),))
+				cur.execute("UPDATE FormSubmissions SET completed = ? , dateSubmitted = ? WHERE id = ?",("True",stringed_date_time,form_id,))
+				print("2")
+				conn.commit()
+				print("3")
+			except:
+				conn.rollback()
+				print("ROLLING FROM return question")
+			finally:
+				cur.close()
+
+			print("WIll submit")
+			try:
+				conn = sqlite3.connect(DATABASE)
+				print("connected")
+				cur = conn.cursor()
+				print("cursor")
+				cur.execute("SELECT patientName FROM Patients WHERE patientID=?",(int(patient_id),))
+				print("executed")
+				info = cur.fetchone()
+				print(info)
+				conn.commit()
+				msg = "Retrieved"
+			except:
+				conn.rollback()
+				print("rollback")
+				msg = "error"
+			finally:
+				conn.close()
+			return render_template("Submit-Complete.html", date = current_date, name = info[0], form_id =form_id, id = patient_id  )
+		if "Back" in request.form:
+			print("WIll go back")
+			return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(39))
+
+
 # Hard codeed - testing if server is successfully processes data into the DB
 # @app.route("/getquestion")
 # def testing_data():
@@ -535,7 +593,7 @@ def p_home(id):
 		return redirect(url_for('login'))
 	elif session.get('usertype') != 'Patient':
 		return "ERROR - Permission required"
-
+	delete_any_old_assessments(id)
 	try:
 		conn = sqlite3.connect(DATABASE)
 		print("connected")
@@ -554,36 +612,119 @@ def p_home(id):
 	finally:
 		conn.close()
 
-
-
-
-
 	return render_template("Patient.html", id = id, Email = info[1], Age = info[2], Gender = info[3], Name = info[0])
+def delete_any_old_assessments(id):
+	try:
+		conn = sqlite3.connect(DATABASE)
+		print("connected")
+		cur = conn.cursor()
+		print("cursor")
+		cur.execute("SELECT id, dateCreated FROM FormSubmissions WHERE patientID = ?;",(int(id),))
+		print("selected")
+		fetched_forms = cur.fetchall()
+		print("fetched")
+		print(fetched_forms)
+
+	# past_date = datetime(int(stringed_date[2]),int(stringed_date[1]),int(stringed_date[0]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
+	#
+	# difference = datetime.utcnow() - past_date
+	# if (difference.days == 0):
+	# 	msg = "Date is within 24 hours"
+	#
+	# else:
+	# 	msg = "You can no longer edit this submisssion"
+	except:
+		conn.rollback()
+		print("rollback")
+	finally:
+		conn.close()
+	fetched_forms = map(list, fetched_forms)
+	for form in fetched_forms:
+		print(form)
+		stringed_date_time = form[1].split(",")
+		stringed_date = stringed_date_time[0].split("-")
+		stringed_time = stringed_date_time[1].split(":")
+		past_date = datetime(int(stringed_date[2]),int(stringed_date[1]),int(stringed_date[0]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
+		print(stringed_date,stringed_time)
+
+		print(past_date)
+		difference = datetime.utcnow() - past_date
+		print(difference)
+		if (difference.days == 0):
+			msg = "Date is within 24 hours"
+
+		else:
+			msg = "You can no longer edit this submisssion"
+			delete_form_from_db(id)
+		print(msg)
+def delete_form_from_db(id):
+	try:
+		conn = sqlite3.connect(DATABASE)
+		print("connected")
+		cur = conn.cursor()
+		print("cursor")
+		cur.execute("DELETE FROM Results WHERE form_id = ?",(int(id),))
+		cur.execute("DELETE FROM FormSubmissions WHERE id = ?",(int(id),))
+		conn.commit()
+	except:
+		conn.rollback()
+		print("rollback")
+	finally:
+		conn.close()
+
+
 @app.route("/Home/Patient/<int:user_id>/Edit_Submissions")
-def edit_submission(user_id):
+def edit_submissions(user_id):
 	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
 		return redirect(url_for('login'))
+	try:
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		print("HEY")
+		print(user_id)
+		# Gets the date/time time the form was submitted with the id for the specific patient
+		cur.execute("SELECT FormSubmissions.dateCreated, FormSubmissions.id FROM FormSubmissions WHERE patientID = ?",(user_id,))
+		date_time = cur.fetchone()
+		# Gets all of the results for that one submisson (put in differnt app route)
+		cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
+		FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
+		INNER JOIN Questions ON Questions.questionID = Results.questionID
+		INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
+		WHERE FormSubmissions.completed = "False" AND Results.patientID = ?;""",(user_id,))
+		# Gets the date created and completed forms from a specific patient
+		cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = ? AND completed = 'False'", (user_id,))
+		submissions_by_patient = cur.fetchall()
+		print(submissions_by_patient)
+		print(f"Date is {date_time[0]} and time was {date_time[1]}")
+	except:
+		conn.rollback()
+		print("rollback 123456346")
+		submissions_by_patient = []
 
-	conn = sqlite3.connect(DATABASE)
-	cur = conn.cursor()
-	print("HEY")
-	print(user_id)
-	# Gets the date/time time the form was submitted with the id for the specific patient
-	cur.execute("SELECT FormSubmissions.dateCreated, FormSubmissions.id FROM FormSubmissions WHERE patientID = ?",(user_id,))
-	date_time = cur.fetchone()
-	# Gets all of the results for that one submisson (put in differnt app route)
-	cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
-	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
-	INNER JOIN Questions ON Questions.questionID = Results.questionID
-	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
-	WHERE FormSubmissions.completed = "False" AND Results.patientID = ?;""",(user_id,))
-	# Gets the date created and completed forms from a specific patient
-	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = ? AND completed = 'False'", (user_id,))
-	submissions_by_patient = cur.fetchall()
-	print(submissions_by_patient)
-	print(f"Date is {date_time[0]} and time was {date_time[1]}")
 
 	return render_template("Edit_Submissions.html", submissions = submissions_by_patient, user_id = user_id)
+@app.route("/edit_submission/<int:patient_id>/<int:form_id>")
+def edit_form(patient_id,form_id):
+	print("pateinte",patient_id, "form",form_id)
+	try:
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		print("1")
+		cur.execute("SELECT questionID FROM Results WHERE form_id =? AND patientID =? ORDER BY questionID DESC LIMIT 1",(int(form_id),int(patient_id),))
+		print("2")
+		fetched_question_number = cur.fetchone()
+		print("3", fetched_question_number)
+		print("Q NUMER", fetched_question_number[0])
+		fetched_question_number = fetched_question_number[0]
+	except:
+		conn.rollback()
+		print("rollback 123456346")
+	finally:
+		conn.close()
+	if fetched_question_number == None:
+		fetched_question_number = 1
+	return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(fetched_question_number))
+
 @app.route("/New-Assessment/<int:patient_id>")
 def new_surver(patient_id):
 	if not session.get('logged_in') and not session.get('usertype') and not session.get('username'):
@@ -601,7 +742,7 @@ def new_surver(patient_id):
 	stringed_time = current_time.split(":")
 
 	stringed_date_time = current_date + "," + current_time
-	cur.execute("INSERT INTO FormSubmissions (patientID, completed, dateCreated) VALUES (?,?,?)",(patient_id,'False',stringed_date_time,))
+	cur.execute("INSERT INTO FormSubmissions (patientID, completed, dateCreated,dateSubmitted) VALUES (?,?,?,?)",(patient_id,'False',stringed_date_time," ",))
 	print("DATE-TIME", current_date + "," + current_time,stringed_date_time)
 	form_id = cur.lastrowid
 	conn.commit()
@@ -617,7 +758,7 @@ def new_surver(patient_id):
 		msg = "You can no longer edit this submisssion"
 	print("TIME DIFFERENCE", difference)
 	print(i,past_date)
-
+	print(msg)
 	print (current_date,current_time)
 	return redirect("getquestion/"+str(patient_id)+"/"+str(form_id)+"/"+str(1))
 
@@ -669,12 +810,14 @@ def user(user_id):
 	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
 	WHERE FormSubmissions.completed = "True" AND Results.patientID = ?;""",(user_id,))
 	# Gets the date created and completed forms from a specific patient
+	cur.execute("SELECT patientName FROM Patients WHERE patientID = ?", (user_id,))
+	name = cur.fetchone()[0]
 	cur.execute("SELECT dateCreated, id FROM FormSubmissions WHERE patientID = ? AND completed = 'True'", (user_id,))
 	submissions_by_patient = cur.fetchall()
 	print(submissions_by_patient)
 	print(f"Date is {date_time[0]} and time was {date_time[1]}")
 
-	return render_template("Patient-Submissions.html", submissions = submissions_by_patient, user_id = user_id)
+	return render_template("Patient-Submissions.html", submissions = submissions_by_patient, user_id = user_id, Name =name)
 
 
 @app.route("/View/<int:user_id>/<int:form_id>")
