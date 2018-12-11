@@ -1,40 +1,51 @@
   {%extends 'test.html'%}
   {% block navbar%}
   <center><nav class="nav-bar">
-    <a href = "/Home/Clinition"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
+    <a href = "/Home/Patient/{{user_id}}"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
     <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
   </nav></center>
   {% endblock %}
+
 {%block testBlock%}
+<!-- {{submissions}} -->
 <h3>User's submissions</h3><br/>
-<table class="table">
-  <tr>
-  <th>Form Id</th>
-  <th>Date Created</th>
-  <th>Time Created</th>
-</tr>
+<!-- {{submissions}} -->
+{%if not submissions%}
 
-  {%for submission in submissions%}
-  <!-- {{submission}} -->
-  {% set list1 = submission[0].split(",")%}
-  <!-- {{list1[0]}} -->
-  {%set list2 = list1[1][0:-7]%}
+  <p id = "message">You currently do not have any surveys that can be edited. Please start a new assessment.</p>
+  <a href = "/Home/Patient/{{user_id}}"> BACK</a>
 
-  <tr class="submission-row" onclick="window.location='/View/{{user_id}}/{{submission[1]}}';">
-
-    <td>
-      {{submission[1]}}
-    </td>
-    <td>
-      {{list1[0]}}<br/>
-    </td>
-    <td>
-      {{list2}}<br/>
-    </td>
-
+{%else%}
+  <table class="results-table">
+    <tr>
+    <th>Form Id</th>
+    <th>Date Created</th>
+    <th>Time Created</th>
   </tr>
 
-  {%endfor%}
+    {%for submission in submissions%}
+    <!-- {{submission}} -->
+    {% set list1 = submission[0].split(",")%}
+    <!-- {{list1[0]}} -->
+    {%set list2 = list1[1][0:-7]%}
+
+    <tr class="submission-row" onclick="window.location='/edit_submission/{{user_id}}/{{submission[1]}}';">
+
+      <td>
+        {{submission[1]}}
+      </td>
+      <td>
+        {{list1[0]}}<br/>
+      </td>
+      <td>
+        {{list2}}<br/>
+      </td>
+
+    </tr>
+    {%endfor%}
+{%endif%}
+
+
 </table>
 
 {%endblock%}

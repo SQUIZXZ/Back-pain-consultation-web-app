@@ -1,0 +1,22 @@
+{%extends 'test.html'%}
+{% block navbar%}
+<center><nav class="nav-bar">
+  <a href = "/Home/Patient/{{id}}"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
+  <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
+</nav></center>
+{% endblock %}
+{%block testBlock%}
+<h3> Submission Successful</h3>
+<br><br>
+<div class = "information">
+  <p>A submission has been made for: {{name}}</p>
+  <p>Patient ID: {{id}}</p>
+  <p>Date Submitted: {{date}}</p>
+  <p>Form Reference Number: {{form_id}}</p>
+</div>
+
+
+
+
+
+{%endblock%}

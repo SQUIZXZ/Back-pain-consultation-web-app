@@ -25,7 +25,7 @@
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
-.form input {
+.form input,select{
   font-family: "Roboto", sans-serif;
   outline: 0;
   background: #f2f2f2;
@@ -36,6 +36,20 @@
   box-sizing: border-box;
   font-size: 14px;
 }
+.text-field{
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 1px solid black;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+
+}
+
+
 .form button {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
@@ -280,9 +294,10 @@ h1{
 }
 .submission-row{
   cursor:pointer;
+  text-align: center;
 }
 
-<<<<<<< HEAD
+
 .results-table {
   padding: 10px;
 }
@@ -291,14 +306,14 @@ h1{
   padding: 14px;
 }
 
-.results-table tr:hover{
+.submission-row:hover{
   color: white;
   background-color: #4CAF50;
 }
 
 .patients-list a:hover {
   color: #4CAF50;
-=======
+}
 .information{
   text-align: left;
   font-size: 20;
@@ -306,5 +321,5 @@ h1{
 
 .information ul{
   list-style: none;
->>>>>>> 35cb4f52a3d893b9be355bcac11c5ce99aaf6781
+
 }

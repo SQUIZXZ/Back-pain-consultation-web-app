@@ -5,8 +5,11 @@
     <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
   </nav></center>
   {% endblock %}
+
 {%block testBlock%}
-<h3>User's submissions</h3><br/>
+<!-- {{submissions}} -->
+<h3>Submissions for: {{Name}}</h3><br/>
+
 <table class="results-table">
   <tr>
   <th>Form Id</th>
@@ -36,6 +39,7 @@
   </tr>
 
   {%endfor%}
+
 </table>
 
 {%endblock%}

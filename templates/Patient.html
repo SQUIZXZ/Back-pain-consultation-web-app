@@ -1,14 +1,16 @@
 {%extends 'test.html'%}
 {% block navbar%}
 <center><nav class="nav-bar">
+
   <a href = "/Home/Patient/{{id}}"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
   <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
 </nav></center>
 {% endblock %}
 {%block testBlock%}
-Your personal ID: {{id}}<br/><br/>
+
 <div class = "information">
   <ul>
+<li>Patient ID: {{id}}</li><br/>
 <li>Name: {{Name}}</li><br/>
 <li>Email: {{Email}}</li><br/>
 <li>Age: {{Age}}</li><br/>
