@@ -1,14 +1,18 @@
 *{
   padding: 0px;
   margin: 0px;
-  -webkit-animation: fadein 0.9s;
+  -webkit-animation: fadein 0.1s;
 }
 
 @keyframes fadein {
    from { opacity: 0; }
    to   { opacity: 1; }
 }
-
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .login-page {
   width: 360px;
   padding: 8% 0 0;

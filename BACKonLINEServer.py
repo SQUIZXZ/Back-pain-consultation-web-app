@@ -661,8 +661,8 @@ def delete_any_old_assessments(id):
 		cur.execute("SELECT id, dateCreated FROM FormSubmissions WHERE patientID = ?;",(int(id),))
 		print("selected")
 		fetched_forms = cur.fetchall()
-		print("fetched")
-		print(fetched_forms)
+		print("fetched",fetched_forms)
+
 
 	# past_date = datetime(int(stringed_date[2]),int(stringed_date[1]),int(stringed_date[0]),int(stringed_time[0]),int(stringed_time[1]),int(stringed_time[2]),int(stringed_time[3]))
 	#
@@ -679,6 +679,8 @@ def delete_any_old_assessments(id):
 		conn.close()
 	fetched_forms = map(list, fetched_forms)
 	for form in fetched_forms:
+		form_id = form[0]
+		print("ID",int(form_id))
 		print(form)
 		stringed_date_time = form[1].split(",")
 		stringed_date = stringed_date_time[0].split("-")
@@ -694,17 +696,19 @@ def delete_any_old_assessments(id):
 
 		else:
 			msg = "You can no longer edit this submisssion"
-			delete_form_from_db(id)
+			delete_form_from_db(form_id)
 		print(msg)
 def delete_form_from_db(id):
+	print("ID PASSED",id)
 	try:
 		conn = sqlite3.connect(DATABASE)
 		print("connected")
 		cur = conn.cursor()
-		print("cursor")
-		cur.execute("DELETE FROM Results WHERE form_id = ?",(int(id),))
-		cur.execute("DELETE FROM FormSubmissions WHERE id = ?",(int(id),))
+		print("delted")
+		cur.execute("DELETE FROM Results WHERE form_id = ?",(id,))
+		cur.execute("DELETE FROM FormSubmissions WHERE id = ?",(id,))
 		conn.commit()
+		print("delete complete")
 	except:
 		conn.rollback()
 		print("rollback")
