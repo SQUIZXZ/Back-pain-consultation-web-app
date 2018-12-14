@@ -20,7 +20,11 @@
     <input type="radio" id="{{value}}" name="option" value="{{value}}" />
   </label>
   {%endfor%}
-
+  </div>
+  <br>  <br>
+  <input class="question-button" type="submit" name="Back" value="Back" formnovalidate>
+  <input class="question-button" type="submit" name="Next" value="Next">
+  </form>
   <script>
     // console.log("HELLO")
     var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
