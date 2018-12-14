@@ -677,11 +677,7 @@ def user(user_id):
 	print(user_id)
 	cur.execute("SELECT FormSubmissions.dateCreated, FormSubmissions.id FROM FormSubmissions WHERE patientID = ?",(user_id,))
 	date_time = cur.fetchone()
-	cur.execute("""SELECT QuestionTypes.questionType,Questions.questionType, Results.questionID, Results.optionID, Results.optionValue, Results.textField, FormSubmissions.dateCreated
-	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID
-	INNER JOIN Questions ON Questions.questionID = Results.questionID
-	INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
-	WHERE FormSubmissions.completed = "True" AND Results.patientID = ?;""",(user_id,))
+
 	cur.execute("SELECT patientName FROM Patients WHERE patientID = ?", (user_id,))
 	name = cur.fetchone()[0]
 	cur.execute("SELECT dateCreated, id, totalScores FROM FormSubmissions WHERE patientID = ? AND completed = 'True'", (user_id,))
@@ -706,6 +702,8 @@ def show_form(user_id,form_id):
 	# INNER JOIN Questions ON Questions.questionID = Results.questionID
 	# INNER JOIN QuestionTypes ON QuestionTypes.typeID = Questions.questionType
 	# WHERE FormSubmissions.completed = "True" AND FormSubmissions.id = ? AND Results.patientID = ?;""",(form_id,user_id,))
+	cur.execute("SELECT patientName  FROM Patients WHERE patientID = ?",(int(user_id),))
+	patient_name = cur.fetchone()[0]
 	cur.execute("""SELECT QuestionTypes.questionType, Questions.question, Results.questionID, Results.optionID, Results.textField
 	FROM Results INNER JOIN FormSubmissions ON Results.patientID = FormSubmissions.patientID AND Results.form_id = FormSubmissions.id
 	INNER JOIN Questions ON Questions.questionID = Results.questionID
@@ -737,39 +735,132 @@ def show_form(user_id,form_id):
 			option_texts.append(values)
 			print("multiple")
 		else:
+			values = []
 			cur.execute("SELECT optionText FROM Options WHERE optionID = ?", (split_options[0],))
 			option_text = cur.fetchone()[0]
-			option_texts.append(option_text)
+			values.append(option_text)
+			option_texts.append(values)
 	print("FINALLY",option_texts)
 	print("BEFORE INSERTS",results)
 	for x in range (0, len(results)):
 		results[x][3] = option_texts[x]
-	print(results)
+	print("THIS IS BEING PASS AS PARAMERTE",results)
 	# print("LIST LIST", options_list)
 	print(user_id,form_id)
-	return render_template("Submission.html", form_results = results)
+	return render_template("Submission.html", form_results = results, name = patient_name, formID = form_id)
 
-@app.route("/submitoption")
-def submitoption():
-	nextquestion = int(request.cookies.get('questionID'))
-	print(nextquestion)
-	conn = sqlite3.connect(DATABASE)
-	cur = conn.cursor()
-	questionID = nextquestion + 1
-	cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (questionID,))
-	questionNum = cur.fetchone()
-	cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
-	question = cur.fetchone()
-	cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
-	options = cur.fetchall()
-	print(questionNum,question,options)
+@app.route("/add_data_for_submission/<int:patient_id>")
+def submitoption(patient_id):
+	i = datetime.now()
+	current_date = i.strftime("%d-%m-%Y")
+	stringed_date = current_date.split("-")
 
-	resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options, questionNum = questionNum))
-	resp.set_cookie('questionID', '1')
+	current_time = i.strftime("%H:%M:%S:%f")
+	stringed_time = current_time.split(":")
+
+	stringed_date_time = current_date + "," + current_time
+	try:
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		# cur.execute("UPDATE Results SET optionID = ? , textField = ?, optionValue = ? WHERE form_id =? AND questionID = ? AND patientID = ? ",(option_ids,text,values,form_id,question_number[0],patient_id,))
+
+		cur.execute("UPDATE FormSubmissions SET patientID = ? ,dateCreated = ? WHERE id =?",(patient_id,stringed_date_time,1))
+		cur.execute("UPDATE Results SET patientID = ? WHERE form_id = 1", (patient_id,))
+		conn.commit()
+		print("COMMITED TO DB")
+	except:
+		conn.rollback()
+		print("ILJ")
+		pass
+	finally:
+		conn.close()
+
+	return ("ADDING DATA FOR PATIENT" + str(patient_id))
+	# nextquestion = int(request.cookies.get('questionID'))
+	# print(nextquestion)
+	# conn = sqlite3.connect(DATABASE)
+	# cur = conn.cursor()
+	# questionID = nextquestion + 1
+	# cur.execute("SELECT questionID FROM Questions WHERE questionID = ?", (questionID,))
+	# questionNum = cur.fetchone()
+	# cur.execute("SELECT question FROM Questions WHERE questionID = ?", (questionID,))
+	# question = cur.fetchone()
+	# cur.execute("SELECT optionText FROM Options WHERE questionID = ?", (questionID,))
+	# options = cur.fetchall()
+	# print(questionNum,question,options)
+	#
+	# resp = make_response(render_template('Template1.html', name = "Humzah", question = question[0], options = options, questionNum = questionNum))
+	# resp.set_cookie('questionID', '1')
+	#
+	#
+	# return resp
+@app.route("/add_data/24-hour/<int:patient_id>")
+def add_24_hour_test_form(patient_id):
+	i = datetime.now()
+	current_date = i.strftime("%d-%m-%Y")
+	stringed_date = current_date.split("-")
+	new_date = int(stringed_date[0]) - 1
+	stringed_date[0] = str(new_date)
+	print(new_date,stringed_date)
+
+	current_time = i.strftime("%H:%M:%S:%f")
+	stringed_time = current_time.split(":")
+	print("ITME",stringed_time)
+	new_minute = int(stringed_time[1]) + 1
+	print(new_minute)
+	if (new_minute > 60):
+		print("NEED TO REMOVE HOUR")
+		new_hour = int(stringed_time[0]) + 1
+		stringed_time[1] = "00"
+		stringed_time[0] = str(new_hour)
+
+	else:
+		print("NEED TO REMOVE minutes")
+		add_60_seconds = int(stringed_time[1]) + 1
+		stringed_time[1] = str(add_60_seconds)
+
+	new_date_string = "-".join(stringed_date)
+	new_time_string = ":".join(stringed_time)
+	print(new_date_string,new_time_string)
+	stringed_date_time = new_date_string + "," + new_time_string
+	try:
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
 
 
-	return resp
 
+		cur.execute("INSERT INTO FormSubmissions (patientID, completed, dateCreated,dateSubmitted,totalScores) VALUES (?,?,?,?,?)",(patient_id,'False',stringed_date_time," "," ",))
+		form_id = cur.lastrowid
+		conn.commit()
+		print("SUBMITTED WITH FORM ID", form_id)
+	except:
+		conn.rollback()
+		print("rollback 123456346")
+	finally:
+		conn.close()
+
+	return ("ADDING 24 hour submission form for patient: "+ str(patient_id))
+@app.route("/add_submissions")
+def add_submission():
+	try:
+		conn = sqlite3.connect(DATABASE)
+		cur = conn.cursor()
+		cur.execute("UPDATE FormSubmissions SET completed = 'True' WHERE id = 23;")
+		cur.execute("UPDATE FormSubmissions SET completed = 'True' WHERE id = 24;")
+		cur.execute("UPDATE FormSubmissions SET completed = 'True' WHERE id = 25;")
+		cur.execute("UPDATE FormSubmissions SET completed = 'True' WHERE id = 26;")
+		cur.execute("UPDATE FormSubmissions SET completed = 'True' WHERE id = 27;")
+		cur.execute("UPDATE FormSubmissions SET completed = 'True' WHERE id = 28;")
+		conn.commit()
+
+
+	except:
+		conn.rollback()
+		print("rollback 123456346")
+	finally:
+		conn.close()
+
+	return "Adding Submissions for Patients"
 
 if __name__ == "__main__":
 	app.run(debug=True)
