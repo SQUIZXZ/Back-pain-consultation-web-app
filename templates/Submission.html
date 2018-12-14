@@ -1,46 +1,65 @@
-  {%extends 'test.html'%}
-  {% block navbar%}
-  <center><nav class="nav-bar">
-    <a href = "/Home/Clinition"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
-    <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
-  </nav></center>
-  {% endblock %}
+{%extends 'test.html'%}
+{% block navbar%}
+<center><nav class="nav-bar">
+  <a href = "/Home/Clinition"> <i class="fa fa-fw fa-user"></i>PROFILE</a>
+  <a href ="/logout" > <i class="fa fa-fw fa-user"></i>LOGOUT</a>
+</nav></center>
+{% endblock %}
 {%block testBlock%}
-
+Showing Results for: {{name}}
+Form ID: {{formID}}
+<br><br>
 {%for question in form_results%}
 <article class="question-box">
-  <h2>Question {{question[2]}}:</h2>
-  <p>{{question[1]}}</p>
-  <br/>
+<h2>Question {{question[2]}}:</h2>
+<p>{{question[1]}}</p>
+<br/>
 <form>
 {%if question[0] == "Single-Answer"%}
-
+{%for option in question[3]%}
 <label class="radios">
-<input type="radio" name="option"  checked = "checked" disabled  >
-{{question[3]}}
+<input class="box" type="radio" name="option"  checked = "checked" disabled  >
+{{option}}
 <span class="checkmark"></span>
 </label>
-
+{%endfor%}
 
 
 {%elif question[0] == "Multiple-Answer"%}
+
+
 {%for option in question[3]%}
 <label class="radios">
-  <input class="box" type="checkbox" name="option" checked = "checked"  disabled  >
-  {{option}}
-  <span class="checkmark"></span>
+<input class="box" type="checkbox" name="option" checked = "checked"  disabled  >
+{{option}}
+<span class="checkmark"></span>
 </label>
 {%endfor%}
 
 {%elif question[0] == "Text-Field"%}
 <label class="text-fields">
-  <input type="text" size="90" class="text-field" name="option" value="{{question[4]}}" readonly >
+<input type="text" size="90" class="text-field" name="option" value="{{question[4]}}" readonly >
 </label>
 
 {%elif question[0] == "Slider"%}
-<li>{{question}} Slider answer</li>
-</article>
+
+<div id = "slider">
+{%for value in [0,1,2,3,4,5,6,7,8,9,10]%}
+
+<label class="slideroptions" >{{value}}<br />
+
+{%if (value|string == question[3][0]|string)%}
+<input type="radio" id="{{value}}" name="option" value="{{value}}" checked  />
+{%else%}
+<input type="radio" id="{{value}}" name="option" value="{{value}}" />
+{%endif%}
+</label>
+{%endfor%}
+
+</div>
 {%endif%}
 </form>
+</article>
 {%endfor%}
+
 {%endblock%}

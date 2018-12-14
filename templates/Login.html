@@ -5,15 +5,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='CssforTemplates.css') }}">
 </head>
 <body style="background-color: #DEE2E5">
-
+  <header class="header">
+    <img class="logo" src = "{{ url_for('static', filename = 'Cardiff.jpg') }}" id="Cardiff" style="width:100;height:100;">
+    <img class="logo" src = "{{ url_for('static', filename = 'Arthritis.jpg') }}" id="Arthritis" style="width:100;height:100;">
+    <div class="title">
+      <center><h1 class="header-title">BACKonLINE™</h1></center>
+    </div>
+  </header>
 <div class="login-page">
   <div class="form">
+
     <h1 class="form-title">LOGIN</h1>
     <form class ="login-form" method = "POST">
       <input type="text" name="email" placeholder="Email">
       <input type="password" name="password" placeholder="Password"><br/>
       <button type="submit">LOGIN</button>
-      <p class="message">Create an account?<a href="/SignUp">SIGN UP</a></p><br/>
+      <p class="message">Create an account? <a href="/SignUp">SIGN UP</a></p><br/>
     </form>
     {% for message in get_flashed_messages() %}
     <div class="flash">
@@ -24,16 +31,3 @@
 </div>
 
 </html>
-
-<!-- <form class="login-form" method="POST">
-  <input type="text" name="username" placeholder="username">
-  <input type="password" name="password" placeholder="password"><br/>
-  <input class="login-button" type="submit">
-  <p class="sign-up"><a href="">Sign up</a></p><br/>
-</form>
-{% for message in get_flashed_messages() %}
-<div class="flash">
-  {{ message }}
-</div>
-{% endfor %}
-</div> -->

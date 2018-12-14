@@ -10,12 +10,6 @@
   <!-- <p> This is Template {{ name }} </p> -->
   <p> Question: {{ questionNum[0] }} </p>
   <p>  {{ question }}</p>
-  <!-- <p>Options {{options}}</p> -->
-  <!-- <input type="button" id="subscribeNews" name="subscribe" value="{{options}}"> {{options}} </input> -->
-
-
-
-
 
   <br>
   <meta content = "{{selected_options}}" property = 'options_text'>
@@ -26,53 +20,11 @@
     <input type="radio" id="{{value}}" name="option" value="{{value}}" />
   </label>
   {%endfor%}
-
-  <!-- <label class="slideroptions" >1<br />
-    <input type="radio" id="option1" name="option" value="1" />
-  </label>
-
-  <label class="slideroptions" >2<br />
-    <input type="radio" id="option2" name="option" value="2" />
-  </label>
-
-  <label class="slideroptions" >3<br />
-    <input type="radio" id="option3" name="option" value="3" />
-  </label>
-
-
-  <label class="slideroptions" >4<br />
-    <input type="radio" id="option4" name="option" value="4" />
-  </label>
-
-  <label class="slideroptions" >5<br />
-    <input type="radio" id="option5" name="option" value="5" />
-  </label>
-
-  <label class="slideroptions" >6<br />
-    <input type="radio" id="option6" name="option" value="6" />
-  </label>
-
-  <label class="slideroptions" >7<br />
-    <input type="radio" id="option7" name="option" value="7" />
-  </label>
-
-  <label class="slideroptions" >8<br />
-    <input type="radio" id="option8" name="option" value="8" />
-  </label>
-
-  <label class="slideroptions" >9<br />
-    <input type="radio" id="option9" name="option" value="9" />
-  </label>
-
-  <label class="slideroptions" >10<br />
-    <input type="radio" id="option10" name="option" value="10" />
-  </label> -->
   </div>
-  <br><br>
-    <input class="question-button" type="submit" name="Back" value="Back" formnovalidate>
-    <input class="question-button" type="submit" name="Next" value="Next">
+  <br>  <br>
+  <input class="question-button" type="submit" name="Back" value="Back" formnovalidate>
+  <input class="question-button" type="submit" name="Next" value="Next">
   </form>
-  <!-- <a href = "/"> Next </a> -->
   <script>
     // console.log("HELLO")
     var selected_boxes = document.querySelector("meta[property='options_text']").getAttribute("content");
@@ -89,34 +41,5 @@
   }
 
   }
-  //   len =varray.length;
-  //   for (var i = 0; i<len; i++){
-  //
-  //     // alert(varray[i]);
-  //     var item = varray[i];
-  //     // alert(item === "Codeine");
-  //     var checkbox_select = document.getElementById(item.toString());
-  //     checkbox_select.checked = true;
-  //   }
-  // }
   </script>
   {%endblock%}
-
-
-  <!-- <table class="table">
-
-    <tr>
-      <td>
-        <label class="slider">
-          <input type="range" name="option" min = "{{options[0]}}" max = "{{options[-1]}}" value="5" required = True>
-        </label>
-        {{value}}
-        <ul class ="range-labels">
-          {%for value in options%}
-          <li>{{value}}</li>
-          {%endfor%}
-        </ul>
-      </td>
-    </tr>
-
-  </table> -->
